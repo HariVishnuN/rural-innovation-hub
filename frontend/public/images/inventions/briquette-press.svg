@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pressBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#E2E8F0"/>
+    </linearGradient>
+    <linearGradient id="channelSteel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="50%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#pressBg)"/>
+  <rect y="400" width="800" height="100" fill="#94A3B8"/>
+
+  <!-- Inverted Structural U-Frame (75x40mm ISMC Steel Channels) -->
+  <g fill="url(#channelSteel)" stroke="#0F172A" stroke-width="3">
+    <!-- Base Plate -->
+    <rect x="220" y="380" width="360" height="25" rx="3"/>
+    <!-- Left Column Beam -->
+    <rect x="260" y="100" width="45" height="280" rx="3"/>
+    <!-- Right Column Beam -->
+    <rect x="495" y="100" width="45" height="280" rx="3"/>
+    <!-- Upper Top Crossbeam -->
+    <rect x="240" y="90" width="320" height="50" rx="4"/>
+  </g>
+
+  <!-- Heavy 8.8 High-Tensile Bolts on Structural Frame -->
+  <g fill="#CBD5E1" stroke="#0F172A" stroke-width="1.5">
+    <circle cx="282" cy="115" r="5"/>
+    <circle cx="282" cy="130" r="5"/>
+    <circle cx="517" cy="115" r="5"/>
+    <circle cx="517" cy="130" r="5"/>
+    <circle cx="282" cy="370" r="5"/>
+    <circle cx="517" cy="370" r="5"/>
+  </g>
+
+  <!-- 5-Ton Red Commercial Hydraulic Bottle Jack -->
+  <g transform="translate(365, 140)">
+    <!-- Jack Body Cylinder -->
+    <rect x="0" y="40" width="70" height="90" rx="8" fill="#DC2626" stroke="#991B1B" stroke-width="3"/>
+    <rect x="15" y="10" width="40" height="30" fill="#E2E8F0" stroke="#64748B" stroke-width="2"/> <!-- Ram -->
+    <circle cx="35" cy="8" r="14" fill="#0F172A"/> <!-- Pressure Plate -->
+    <text x="14" y="90" fill="#FFFFFF" font-family="sans-serif" font-size="11" font-weight="bold">5 TON</text>
+
+    <!-- Hydraulic Pumping Handle Lever -->
+    <line x1="65" y1="90" x2="160" y2="40" stroke="#0F172A" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="160" cy="40" r="8" fill="#F59E0B"/>
+  </g>
+
+  <!-- Dual Retraction Coil Springs -->
+  <g stroke="#0284C7" stroke-width="3" fill="none">
+    <path d="M 330 140 Q 340 160 330 180 Q 320 200 330 220 L 330 240"/>
+    <path d="M 470 140 Q 480 160 470 180 Q 460 200 470 220 L 470 240"/>
+  </g>
+
+  <!-- 4-Inch Heavy Steel Compression Cylinder Mould with Perforations -->
+  <g transform="translate(350, 260)">
+    <rect x="0" y="0" width="100" height="110" rx="6" fill="#334155" stroke="#0F172A" stroke-width="3"/>
+    <!-- Perforation Drainage Holes for Moisture Escape -->
+    <g fill="#0284C7">
+      <circle cx="20" cy="30" r="3"/>
+      <circle cx="50" cy="30" r="3"/>
+      <circle cx="80" cy="30" r="3"/>
+      <circle cx="35" cy="60" r="3"/>
+      <circle cx="65" cy="60" r="3"/>
+      <circle cx="20" cy="90" r="3"/>
+      <circle cx="50" cy="90" r="3"/>
+      <circle cx="80" cy="90" r="3"/>
+    </g>
+    <!-- Moisture Drops Escaping -->
+    <circle cx="20" cy="100" r="2" fill="#38BDF8"/>
+    <circle cx="50" cy="102" r="2" fill="#38BDF8"/>
+  </g>
+
+  <!-- Bottom Foot Ejection Lever -->
+  <line x1="320" y1="375" x2="200" y2="395" stroke="#D97706" stroke-width="7" stroke-linecap="round"/>
+  <rect x="180" y="390" width="30" height="12" fill="#0F172A" rx="2"/>
+
+  <!-- Finished Compacted Smokeless Biomass Fuel Log -->
+  <g transform="translate(600, 310)">
+    <rect x="0" y="0" width="60" height="85" rx="6" fill="#78350F" stroke="#451A03" stroke-width="3"/>
+    <line x1="0" y1="20" x2="60" y2="20" stroke="#92400E" stroke-width="2"/>
+    <line x1="0" y1="45" x2="60" y2="45" stroke="#92400E" stroke-width="2"/>
+    <line x1="0" y1="65" x2="60" y2="65" stroke="#92400E" stroke-width="2"/>
+    <!-- Center Air Hole in Briquette -->
+    <ellipse cx="30" cy="10" rx="10" ry="4" fill="#1C1917"/>
+    <text x="-15" y="105" fill="#451A03" font-size="11" font-family="sans-serif" font-weight="bold">Finished Log</text>
+  </g>
+
+  <!-- Raw Biomass Straw Pile on Left -->
+  <path d="M 120 400 Q 150 340 190 380 Q 210 330 240 400 Z" fill="#EAB308" stroke="#CA8A04" stroke-width="2"/>
+  <text x="130" y="420" fill="#78350F" font-size="11" font-family="sans-serif" font-weight="bold">Agri-Residue</text>
+
+  <!-- Title Badge Overlay -->
+  <rect x="25" y="25" width="310" height="36" rx="8" fill="#0F172A" opacity="0.85"/>
+  <text x="40" y="48" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold">5-Ton Hydraulic Briquette Press</text>
+  <text x="250" y="48" fill="#F87171" font-family="sans-serif" font-size="12" font-weight="bold">Smokeless Fuel</text>
+</svg>

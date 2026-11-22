@@ -1,0 +1,17 @@
+{
+  "short_name": "RuralHub",
+  "name": "Rural Innovation Hub",
+  "description": "Grassroots open-hardware inventions, community bounties, and low-cost prototyping.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0D9488",
+  "display": "standalone",
+  "orientation": "portrait"
+}

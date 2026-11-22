@@ -1,0 +1,62 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: rural-innovation-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: rural_innovation_hub
+      MYSQL_USER: hub_user
+      MYSQL_PASSWORD: hub_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hub-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rural-innovation-backend
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mysql+pymysql://hub_user:hub_password@db:3306/rural_innovation_hub
+      - JWT_SECRET=super-secret-rural-innovation-jwt-key-2026-production-ready
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173
+      - DEMO_MODE=true
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - hub-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rural-innovation-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - hub-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  hub-network:
+    driver: bridge

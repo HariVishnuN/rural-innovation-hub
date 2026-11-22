@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="graderBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F1F5F9"/>
+      <stop offset="100%" stop-color="#E2E8F0"/>
+    </linearGradient>
+    <linearGradient id="woodTray" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B45309"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#graderBg)"/>
+  <rect y="400" width="800" height="100" fill="#CBD5E1"/>
+
+  <!-- Steel Base Stand Frame -->
+  <g stroke="#1E293B" stroke-width="8" stroke-linecap="round">
+    <line x1="200" y1="280" x2="170" y2="420"/>
+    <line x1="560" y1="280" x2="590" y2="420"/>
+    <line x1="180" y1="370" x2="580" y2="370" stroke-width="6"/>
+  </g>
+
+  <!-- 4 Heavy Duty Motorcycle Harmonic Springs -->
+  <g stroke="#475569" stroke-width="5" fill="none">
+    <!-- Left Front Spring -->
+    <path d="M 210 280 Q 225 290 210 300 Q 195 310 210 320 Q 225 330 210 340 L 210 355"/>
+    <!-- Right Front Spring -->
+    <path d="M 550 280 Q 565 290 550 300 Q 535 310 550 320 Q 565 330 550 340 L 550 355"/>
+  </g>
+
+  <!-- 3-Tiered Inclined Sieve Box (Inclined at 7 Degrees) -->
+  <g transform="rotate(7, 380, 240)">
+    <!-- Wooden Box Enclosure -->
+    <rect x="180" y="160" width="400" height="120" rx="6" fill="url(#woodTray)" stroke="#78350F" stroke-width="4"/>
+
+    <!-- Tier 1: 4.0mm Stainless Steel Screen (Coarse trash & pods) -->
+    <line x1="190" y1="190" x2="550" y2="190" stroke="#E2E8F0" stroke-width="4" stroke-dasharray="3,3"/>
+    <text x="200" y="185" fill="#FEF3C7" font-size="10" font-family="sans-serif" font-weight="bold">Deck 1: 4.0mm Oversize Mesh</text>
+
+    <!-- Tier 2: 2.5mm Stainless Steel Screen (Grade-A Prime Seeds) -->
+    <line x1="190" y1="225" x2="550" y2="225" stroke="#CBD5E1" stroke-width="3" stroke-dasharray="2,2"/>
+    <text x="200" y="220" fill="#FEF3C7" font-size="10" font-family="sans-serif" font-weight="bold">Deck 2: 2.5mm Grade-A Seed Screen</text>
+
+    <!-- Tier 3: 1.2mm Dust & Broken Hull Screen -->
+    <line x1="190" y1="260" x2="550" y2="260" stroke="#94A3B8" stroke-width="2" stroke-dasharray="1,2"/>
+    <text x="200" y="255" fill="#FEF3C7" font-size="10" font-family="sans-serif" font-weight="bold">Deck 3: 1.2mm Sift Bottom</text>
+
+    <!-- Eccentric Weight Motor Bolted Underneath -->
+    <rect x="330" y="280" width="70" height="35" rx="6" fill="#0F172A"/>
+    <circle cx="365" cy="298" r="10" fill="#DC2626"/>
+    <!-- Oscillation motion arrows -->
+    <path d="M 320 310 Q 340 330 360 310" stroke="#38BDF8" stroke-width="3" fill="none"/>
+  </g>
+
+  <!-- Feed Hopper Above -->
+  <polygon points="260,80 400,80 360,150 300,150" fill="#0284C7" stroke="#0369A1" stroke-width="3"/>
+  <ellipse cx="330" cy="80" rx="70" ry="12" fill="#38BDF8"/>
+  <!-- Pulses Pouring In -->
+  <circle cx="330" cy="120" r="3" fill="#F59E0B"/>
+  <circle cx="325" cy="135" r="4" fill="#D97706"/>
+  <circle cx="335" cy="140" r="3" fill="#B45309"/>
+
+  <!-- 20W Solar PV Module on Right -->
+  <g transform="translate(620, 100)">
+    <line x1="40" y1="60" x2="40" y2="280" stroke="#475569" stroke-width="5"/>
+    <polygon points="10,60 80,40 75,130 5,150" fill="#0F172A" stroke="#38BDF8" stroke-width="2"/>
+    <!-- Wire to motor -->
+    <path d="M 40 140 Q 500 280 370 300" stroke="#DC2626" stroke-width="2" fill="none" stroke-dasharray="6,3"/>
+  </g>
+
+  <!-- 3 Output Bins for Graded Seeds -->
+  <g transform="translate(560, 360)">
+    <!-- Bin 1: Large Pods -->
+    <rect x="0" y="0" width="45" height="40" fill="#94A3B8" rx="3"/>
+    <circle cx="22" cy="10" r="4" fill="#78350F"/>
+    <!-- Bin 2: Grade-A Pure Seed -->
+    <rect x="55" y="0" width="55" height="40" fill="#16A34A" rx="3"/>
+    <circle cx="82" cy="10" r="4" fill="#FDE047"/>
+    <text x="60" y="32" fill="#FFFFFF" font-size="8" font-family="sans-serif" font-weight="bold">Grade-A</text>
+  </g>
+
+  <!-- Title Badge Overlay -->
+  <rect x="25" y="25" width="310" height="36" rx="8" fill="#0F172A" opacity="0.85"/>
+  <text x="40" y="48" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold">Solar-Vibratory Seed Grader</text>
+  <text x="245" y="48" fill="#22C55E" font-family="sans-serif" font-size="12" font-weight="bold">+25% Germination</text>
+</svg>

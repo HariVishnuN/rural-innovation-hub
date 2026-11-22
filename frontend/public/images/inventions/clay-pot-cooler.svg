@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="coolBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EFF6FF"/>
+      <stop offset="100%" stop-color="#DBEAFE"/>
+    </linearGradient>
+    <linearGradient id="clayOuter" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C2410C"/>
+      <stop offset="50%" stop-color="#EA580C"/>
+      <stop offset="100%" stop-color="#9A3412"/>
+    </linearGradient>
+    <linearGradient id="clayInner" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9A3412"/>
+      <stop offset="50%" stop-color="#C2410C"/>
+      <stop offset="100%" stop-color="#7C2D12"/>
+    </linearGradient>
+    <linearGradient id="sandCavity" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#coolBg)"/>
+  <rect y="400" width="800" height="100" fill="#94A3B8"/>
+
+  <!-- Wooden Ring Base Stand -->
+  <ellipse cx="400" cy="410" rx="140" ry="20" fill="#78350F" stroke="#451A03" stroke-width="4"/>
+
+  <!-- Large Exterior Porous Terracotta Clay Pot (60cm Outer Shell) -->
+  <g>
+    <!-- Outer Pot Body -->
+    <path d="M 250 170 Q 220 280 280 390 L 520 390 Q 580 280 550 170 Z" fill="url(#clayOuter)" stroke="#7C2D12" stroke-width="5"/>
+    <ellipse cx="400" cy="170" rx="150" ry="25" fill="#EA580C" stroke="#7C2D12" stroke-width="4"/>
+  </g>
+
+  <!-- Wet Coarse River Sand Perimeter Cavity (10cm Gap) -->
+  <path d="M 280 180 Q 260 270 310 380 L 490 380 Q 540 270 520 180 Z" fill="url(#sandCavity)" opacity="0.9"/>
+  <!-- Water saturation dots in sand -->
+  <g fill="#0284C7">
+    <circle cx="290" cy="240" r="3"/>
+    <circle cx="305" cy="300" r="3"/>
+    <circle cx="495" cy="240" r="3"/>
+    <circle cx="485" cy="310" r="3"/>
+  </g>
+
+  <!-- Smaller Inner Food Storage Pot (40cm Clay Pot) -->
+  <path d="M 320 190 Q 305 270 340 370 L 460 370 Q 495 270 480 190 Z" fill="url(#clayInner)" stroke="#431407" stroke-width="4"/>
+  <ellipse cx="400" cy="190" rx="80" ry="16" fill="#7C2D12"/>
+
+  <!-- Fresh Produce Kept Crisp & Chilled Inside Inner Chamber -->
+  <g transform="translate(370, 260)">
+    <!-- Fresh Tomatoes -->
+    <circle cx="15" cy="30" r="16" fill="#DC2626"/>
+    <circle cx="45" cy="30" r="16" fill="#EF4444"/>
+    <circle cx="30" cy="15" r="14" fill="#B91C1C"/>
+    <!-- Fresh Green Chilies -->
+    <path d="M 0 50 Q 20 60 40 45" stroke="#16A34A" stroke-width="5" fill="none"/>
+    <path d="M 25 55 Q 45 65 65 50" stroke="#15803D" stroke-width="4" fill="none"/>
+  </g>
+
+  <!-- Damp Woven Jute Burlap Sack Covering Top -->
+  <g transform="translate(240, 120)">
+    <path d="M 10 40 Q 160 10 310 40 L 300 65 Q 160 45 20 65 Z" fill="#D97706" stroke="#92400E" stroke-width="3"/>
+    <!-- Woven Jute Burlap texture lines -->
+    <line x1="50" y1="35" x2="60" y2="60" stroke="#78350F" stroke-width="2"/>
+    <line x1="100" y1="30" x2="110" y2="55" stroke="#78350F" stroke-width="2"/>
+    <line x1="160" y1="28" x2="170" y2="53" stroke="#78350F" stroke-width="2"/>
+    <line x1="220" y1="30" x2="230" y2="55" stroke="#78350F" stroke-width="2"/>
+    <line x1="270" y1="35" x2="280" y2="60" stroke="#78350F" stroke-width="2"/>
+  </g>
+
+  <!-- Cooling Arrows / Evaporative Heat Dissipation -->
+  <g stroke="#38BDF8" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M 200 240 Q 170 230 150 250"/>
+    <path d="M 600 240 Q 630 230 650 250"/>
+    <path d="M 210 320 Q 180 310 160 330"/>
+    <path d="M 590 320 Q 620 310 640 330"/>
+  </g>
+  <text x="640" y="235" fill="#0284C7" font-size="11" font-family="sans-serif" font-weight="bold">12°C Cooler</text>
+  <text x="640" y="250" fill="#0284C7" font-size="10" font-family="sans-serif">Evaporative Heat Loss</text>
+
+  <!-- Title Badge Overlay -->
+  <rect x="25" y="25" width="320" height="36" rx="8" fill="#0F172A" opacity="0.85"/>
+  <text x="40" y="48" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold">Clay Pot Evaporative Refrigerator</text>
+  <text x="260" y="48" fill="#38BDF8" font-family="sans-serif" font-size="12" font-weight="bold">0% Electricity</text>
+</svg>

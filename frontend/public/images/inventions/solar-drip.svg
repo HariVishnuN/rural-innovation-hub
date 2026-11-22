@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E0F2FE"/>
+      <stop offset="60%" stop-color="#F0FDF4"/>
+      <stop offset="100%" stop-color="#DCFCE7"/>
+    </linearGradient>
+    <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#78350F"/>
+      <stop offset="100%" stop-color="#451A03"/>
+    </linearGradient>
+    <linearGradient id="drumGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="50%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+    <linearGradient id="pvGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="50%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky and Sun Background -->
+  <rect width="800" height="340" fill="url(#skyGrad)"/>
+  <circle cx="700" cy="80" r="50" fill="#FDE047" opacity="0.9"/>
+  <circle cx="700" cy="80" r="70" fill="#FEF08A" opacity="0.4"/>
+
+  <!-- Farm Ground Soil -->
+  <rect y="340" width="800" height="160" fill="url(#groundGrad)"/>
+
+  <!-- Crop Rows -->
+  <g fill="#15803D">
+    <!-- Row 1 Plants -->
+    <path d="M 400 340 Q 390 310 380 290 Q 400 300 405 340 Z"/>
+    <path d="M 405 340 Q 420 305 435 295 Q 415 310 410 340 Z"/>
+    <ellipse cx="407" cy="290" rx="15" ry="10" fill="#22C55E"/>
+
+    <!-- Row 2 Plants -->
+    <path d="M 520 340 Q 510 310 500 290 Q 520 300 525 340 Z"/>
+    <path d="M 525 340 Q 540 305 555 295 Q 535 310 530 340 Z"/>
+    <ellipse cx="527" cy="290" rx="15" ry="10" fill="#22C55E"/>
+
+    <!-- Row 3 Plants -->
+    <path d="M 640 340 Q 630 310 620 290 Q 640 300 645 340 Z"/>
+    <path d="M 645 340 Q 660 305 675 295 Q 655 310 650 340 Z"/>
+    <ellipse cx="647" cy="290" rx="15" ry="10" fill="#22C55E"/>
+  </g>
+
+  <!-- Elevated Water Drum Stand (Tripod 1.2m) -->
+  <g stroke="#334155" stroke-width="6" stroke-linecap="round">
+    <line x1="120" y1="210" x2="80" y2="350"/>
+    <line x1="220" y1="210" x2="260" y2="350"/>
+    <line x1="170" y1="210" x2="170" y2="350"/>
+    <!-- Cross Bracing -->
+    <line x1="95" y1="280" x2="245" y2="280" stroke-width="4"/>
+  </g>
+
+  <!-- 200L Upcycled Food-Grade Blue Drum -->
+  <rect x="110" y="90" width="120" height="130" rx="15" fill="url(#drumGrad)"/>
+  <!-- Drum Ribs -->
+  <line x1="110" y1="125" x2="230" y2="125" stroke="#0284C7" stroke-width="4"/>
+  <line x1="110" y1="165" x2="230" y2="165" stroke="#0284C7" stroke-width="4"/>
+  <rect x="150" y="80" width="40" height="12" rx="4" fill="#0369A1"/>
+
+  <!-- 40W Solar PV Panel on Mast -->
+  <g transform="translate(40, 60)">
+    <line x1="30" y1="70" x2="30" y2="280" stroke="#475569" stroke-width="5"/>
+    <polygon points="0,70 60,30 65,85 5,125" fill="url(#pvGrad)" stroke="#94A3B8" stroke-width="2"/>
+    <!-- PV Grid lines -->
+    <line x1="15" y1="60" x2="20" y2="115" stroke="#38BDF8" stroke-width="1"/>
+    <line x1="30" y1="50" x2="35" y2="105" stroke="#38BDF8" stroke-width="1"/>
+    <line x1="45" y1="40" x2="50" y2="95" stroke="#38BDF8" stroke-width="1"/>
+  </g>
+
+  <!-- 12V DC Booster Pump & 120-Mesh Filter Box -->
+  <rect x="155" y="290" width="45" height="30" rx="4" fill="#1E293B"/>
+  <circle cx="177" cy="305" r="8" fill="#14B8A6"/>
+  <!-- Red disc filter -->
+  <rect x="205" y="295" width="25" height="20" rx="3" fill="#DC2626"/>
+
+  <!-- Black 16mm LDPE Drip Pipe Line with Droplets -->
+  <path d="M 170 220 L 170 290 L 205 290 L 230 290 L 230 350 L 760 350" fill="none" stroke="#0F172A" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- Micro Drippers & Emitting Water Drops -->
+  <g fill="#0284C7">
+    <!-- Emitter 1 -->
+    <rect x="402" y="344" width="8" height="12" fill="#E11D48"/>
+    <circle cx="406" cy="365" r="4"/>
+    <circle cx="406" cy="378" r="3" opacity="0.7"/>
+
+    <!-- Emitter 2 -->
+    <rect x="522" y="344" width="8" height="12" fill="#E11D48"/>
+    <circle cx="526" cy="365" r="4"/>
+    <circle cx="526" cy="378" r="3" opacity="0.7"/>
+
+    <!-- Emitter 3 -->
+    <rect x="642" y="344" width="8" height="12" fill="#E11D48"/>
+    <circle cx="646" cy="365" r="4"/>
+    <circle cx="646" cy="378" r="3" opacity="0.7"/>
+  </g>
+
+  <!-- Title Badge Overlay -->
+  <rect x="25" y="25" width="310" height="36" rx="8" fill="#0F172A" opacity="0.85"/>
+  <text x="40" y="48" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold">Solar Micro-Drip Irrigation Kit</text>
+  <text x="270" y="48" fill="#38BDF8" font-family="sans-serif" font-size="12" font-weight="bold">65% Water Saved</text>
+</svg>
