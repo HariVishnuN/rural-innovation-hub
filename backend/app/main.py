@@ -54,7 +54,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS Middleware - explicitly allow localhost and 127.0.0.1 origins with credentials
+# CORS Middleware - allow localhost and Vercel frontend origins with credentials
 allowed_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -62,6 +62,8 @@ allowed_origins = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://rural-innovation-hub-kappa.vercel.app",
+    "https://rural-innovation-hub-git-main-nhv4.vercel.app",
 ]
 for origin in settings.cors_origin_list:
     if origin not in allowed_origins:
@@ -70,7 +72,7 @@ for origin in settings.cors_origin_list:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
