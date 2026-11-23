@@ -38,6 +38,8 @@ import { useAuth } from '../../app/AuthContext';
 import apiClient from '../../api/client';
 import { Card, Button, Badge } from '../../components/Button';
 import { getScalingStageBadge } from '../inventions/InventionCard';
+import AnimatedCounter from '../../components/AnimatedCounter';
+import LoadingSkeleton from '../../components/LoadingSkeleton';
 
 const PRESET_AVATARS = [
   { name: 'Hari Vishnu (You)', url: '/images/avatars/harivishnu.jpg' },
@@ -365,9 +367,8 @@ const ProfilePage = () => {
 
   if (loading || !dashboardData) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-24 text-center text-xs text-slate-500 space-y-3">
-        <div className="w-10 h-10 border-3 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="font-semibold text-slate-700">Loading your profile workspace...</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
+        <LoadingSkeleton count={4} type="stats" />
       </div>
     );
   }
@@ -497,47 +498,69 @@ const ProfilePage = () => {
       </motion.div>
 
       {/* ============================================================== */}
-      {/* 2. OVERVIEW STATS STRIP (4 CLEAN CARDS)                         */}
+      {/* 2. OVERVIEW STATS STRIP (4 CLEAN CARDS WITH ANIMATED COUNTERS)  */}
       {/* ============================================================== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: My Inventions */}
-        <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-soft hover:border-teal-200 hover:shadow-lifted transition-all space-y-1"
+        >
           <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
             <span>My Inventions</span>
             <div className="p-2 rounded-xl bg-teal-50 text-teal-600">
               <Wrench className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900 tracking-tight">{summary.total_inventions || 0}</div>
+          <div className="text-2xl font-black text-slate-900 tracking-tight">
+            <AnimatedCounter value={summary.total_inventions || 0} />
+          </div>
           <div className="text-[11px] text-slate-400">Active in public showcase</div>
-        </div>
+        </motion.div>
 
         {/* Card 2: Total Likes */}
-        <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-soft hover:border-red-200 hover:shadow-lifted transition-all space-y-1"
+        >
           <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
             <span>Total Likes Received</span>
             <div className="p-2 rounded-xl bg-red-50 text-red-600">
               <Heart className="w-4 h-4 fill-red-500" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900 tracking-tight">{summary.total_likes || 0}</div>
+          <div className="text-2xl font-black text-slate-900 tracking-tight">
+            <AnimatedCounter value={summary.total_likes || 0} />
+          </div>
           <div className="text-[11px] text-slate-400">Community appreciation</div>
-        </div>
+        </motion.div>
 
         {/* Card 3: Paid Reuses & Buyers */}
-        <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-soft hover:border-emerald-200 hover:shadow-lifted transition-all space-y-1"
+        >
           <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
             <span>Paid Reuses & Buyers</span>
             <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
               <Handshake className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-black text-slate-900 tracking-tight">{summary.total_paid_reuses || 0}</div>
+          <div className="text-2xl font-black text-slate-900 tracking-tight">
+            <AnimatedCounter value={summary.total_paid_reuses || 0} />
+          </div>
           <div className="text-[11px] text-slate-400">Paid adoptions & rentals</div>
-        </div>
+        </motion.div>
 
         {/* Card 4: Total Offers / Earnings */}
-        <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-1">
+        <motion.div
+          whileHover={{ y: -3 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-200/90 shadow-soft hover:border-amber-200 hover:shadow-lifted transition-all space-y-1"
+        >
           <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
             <span>Offers & Earnings (₹)</span>
             <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
@@ -545,10 +568,10 @@ const ProfilePage = () => {
             </div>
           </div>
           <div className="text-2xl font-black text-slate-900 tracking-tight font-mono">
-            ₹{parseFloat(summary.total_earnings_inr || 0).toLocaleString()}
+            <AnimatedCounter value={parseFloat(summary.total_earnings_inr || 0)} prefix="₹" />
           </div>
           <div className="text-[11px] text-slate-400">Committed & paid value</div>
-        </div>
+        </motion.div>
       </div>
 
       {/* ============================================================== */}

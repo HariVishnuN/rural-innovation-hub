@@ -49,10 +49,20 @@ export default {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        gradientFlow: {
+          '0%, 100%': { 'background-size': '200% auto', 'background-position': '0% 50%' },
+          '50%': { 'background-size': '200% auto', 'background-position': '100% 50%' },
+        },
+        floatSlow: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-6px)' },
+        },
       },
       animation: {
         'shimmer': 'shimmer 2s infinite',
         'spin-slow': 'spin 8s linear infinite',
+        'gradient-flow': 'gradientFlow 5s ease infinite',
+        'float-slow': 'floatSlow 4s ease-in-out infinite',
       },
     },
   },

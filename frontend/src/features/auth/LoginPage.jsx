@@ -218,15 +218,15 @@ const LoginPage = () => {
           whileTap={{ scale: 0.985 }}
           transition={{ type: 'spring', stiffness: 450, damping: 25 }}
           onClick={() => handlePortalSwitch('innovator')}
-          className={`relative p-6 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+          className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 cursor-pointer flex flex-col justify-between ${
             selectedPortal === 'innovator'
               ? 'border-teal-600 bg-white shadow-soft ring-2 ring-teal-600/20'
-              : 'border-slate-200 bg-slate-50/70 hover:bg-white hover:border-slate-300'
+              : 'border-slate-200/90 bg-slate-50/70 hover:bg-white hover:border-teal-300 hover:shadow-soft'
           }`}
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-800 flex items-center justify-center shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-800 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-200">
                 <Wrench className="w-6 h-6 text-teal-700" />
               </div>
               {selectedPortal === 'innovator' && (
@@ -244,7 +244,7 @@ const LoginPage = () => {
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-teal-700 block">
                 Portal 1 • Rural Innovators
               </span>
-              <h2 className="text-xl font-black text-slate-900 mt-0.5">
+              <h2 className="text-xl font-black text-slate-900 mt-0.5 group-hover:text-teal-700 transition-colors">
                 Inventor Workspace
               </h2>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
@@ -277,15 +277,15 @@ const LoginPage = () => {
           whileTap={{ scale: 0.985 }}
           transition={{ type: 'spring', stiffness: 450, damping: 25 }}
           onClick={() => handlePortalSwitch('official')}
-          className={`relative p-6 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${
+          className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 cursor-pointer flex flex-col justify-between ${
             selectedPortal === 'official'
               ? 'border-sky-600 bg-white shadow-soft ring-2 ring-sky-600/20'
-              : 'border-slate-200 bg-slate-50/70 hover:bg-white hover:border-slate-300'
+              : 'border-slate-200/90 bg-slate-50/70 hover:bg-white hover:border-sky-300 hover:shadow-soft'
           }`}
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-800 flex items-center justify-center shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-800 flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform duration-200">
                 <Building2 className="w-6 h-6 text-sky-700" />
               </div>
               {selectedPortal === 'official' && (
@@ -303,7 +303,7 @@ const LoginPage = () => {
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-700 block">
                 Portal 2 • Officials & Investors
               </span>
-              <h2 className="text-xl font-black text-slate-900 mt-0.5">
+              <h2 className="text-xl font-black text-slate-900 mt-0.5 group-hover:text-sky-700 transition-colors">
                 Officials Management & Showcase
               </h2>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed">
@@ -336,7 +336,7 @@ const LoginPage = () => {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, duration: 0.4 }}
-        className="max-w-md w-full mx-auto bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/90 shadow-soft hover:shadow-md transition-shadow space-y-6"
+        className="max-w-md w-full mx-auto bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-soft hover:shadow-xl hover:border-teal-200 transition-all duration-300 space-y-6"
       >
         <div>
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">

@@ -234,7 +234,7 @@ const InventionCard = ({ invention, onUpdate }) => {
       whileHover={ultraLite ? { y: -4 } : { y: -6 }}
       transition={{ type: 'spring', damping: 20, stiffness: 220 }}
       style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-      className="relative bg-white rounded-2xl border border-slate-200/90 shadow-soft hover:shadow-xl transition-shadow overflow-hidden flex flex-col"
+      className="relative bg-white rounded-3xl border border-slate-200/90 shadow-soft hover:shadow-xl hover:border-teal-300/80 transition-all duration-300 overflow-hidden flex flex-col group"
     >
       {/* Specular Interactive Glass Glare */}
       {!ultraLite && glarePos.opacity > 0 && (

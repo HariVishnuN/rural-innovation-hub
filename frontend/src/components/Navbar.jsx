@@ -42,10 +42,20 @@ const Navbar = () => {
   const [demoModalOpen, setDemoModalOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
 
   const isActive = (path) => location.pathname === path;
+
+  // Track scroll for frosted glass shadow elevation
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -71,7 +81,9 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+      <header className={`sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b transition-all duration-300 ${
+        scrolled ? 'border-slate-200/90 shadow-md shadow-slate-900/5' : 'border-slate-200/50 shadow-none'
+      }`}>
         {/* Offline indicator banner */}
         {!isOnline && (
           <div className="bg-amber-600 text-white text-xs py-1 px-4 text-center font-medium">
@@ -81,10 +93,10 @@ const Navbar = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-soft">
-                <Lightbulb className="w-5 h-5 text-amber-300" />
+            {/* Logo with micro hover lift */}
+            <Link to="/" className="flex items-center gap-2.5 group transition-transform hover:-translate-y-0.5">
+              <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-soft group-hover:shadow-teal-500/25 group-hover:bg-teal-700 transition-all">
+                <Lightbulb className="w-5 h-5 text-amber-300 transition-transform group-hover:rotate-12" />
               </div>
               <div>
                 <span className="font-black text-lg text-slate-900 tracking-tight flex items-center gap-1.5">
@@ -96,58 +108,94 @@ const Navbar = () => {
               </div>
             </Link>
 
-            {/* Desktop Navigation Links (Clean Single-Row Layout) */}
+            {/* Desktop Navigation Links with animated hover underlines */}
             <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
               {/* 1. Showcase Catalog */}
               <Link
                 to="/discover"
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   isActive('/discover')
-                    ? 'bg-teal-50 text-teal-700'
-                    : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'text-teal-700 font-extrabold bg-teal-50/70'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                 }`}
               >
-                <Search className="w-3.5 h-3.5 text-teal-600" />
+                <Search className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
                 <span>Showcase Catalog</span>
+                {isActive('/discover') ? (
+                  <motion.div
+                    layoutId="navbar-active-indicator"
+                    className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-teal-600 rounded-full"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                ) : (
+                  <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-teal-600/70 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                )}
               </Link>
 
               {/* Investors & Pitch Directory */}
               <Link
                 to="/investors"
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   isActive('/investors')
-                    ? 'bg-teal-50 text-teal-700'
-                    : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'text-teal-700 font-extrabold bg-teal-50/70'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                 }`}
               >
-                <Users className="w-3.5 h-3.5 text-teal-600" />
+                <Users className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
                 <span>Investors & Pitch</span>
+                {isActive('/investors') ? (
+                  <motion.div
+                    layoutId="navbar-active-indicator"
+                    className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-teal-600 rounded-full"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                ) : (
+                  <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-teal-600/70 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                )}
               </Link>
 
               {/* 2. Role-specific primary link */}
               {user?.role === 'INVESTOR' || user?.role === 'OFFICIAL' || user?.role === 'ADMIN' ? (
                 <Link
                   to="/officials"
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/officials')
-                      ? 'bg-sky-50 text-sky-700'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'text-sky-700 font-extrabold bg-sky-50/70'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <Building2 className="w-3.5 h-3.5 text-sky-600" />
+                  <Building2 className="w-3.5 h-3.5 text-sky-600 transition-transform group-hover:scale-110" />
                   <span>Officials Portal</span>
+                  {isActive('/officials') ? (
+                    <motion.div
+                      layoutId="navbar-active-indicator"
+                      className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-sky-600 rounded-full"
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  ) : (
+                    <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-sky-600/70 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                  )}
                 </Link>
               ) : isAuthenticated ? (
                 <Link
                   to="/dashboard"
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/dashboard')
-                      ? 'bg-teal-50 text-teal-700'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'text-teal-700 font-extrabold bg-teal-50/70'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <Lightbulb className="w-3.5 h-3.5 text-teal-600" />
+                  <Lightbulb className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
                   <span>Inventor Workspace</span>
+                  {isActive('/dashboard') ? (
+                    <motion.div
+                      layoutId="navbar-active-indicator"
+                      className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-teal-600 rounded-full"
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  ) : (
+                    <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-teal-600/70 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                  )}
                 </Link>
               ) : null}
 
@@ -155,14 +203,23 @@ const Navbar = () => {
               {isAuthenticated && (
                 <Link
                   to="/offers"
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/offers')
-                      ? 'bg-teal-50 text-teal-700'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'text-teal-700 font-extrabold bg-teal-50/70'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <ShoppingBag className="w-3.5 h-3.5 text-teal-600" />
+                  <ShoppingBag className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
                   <span>Offers</span>
+                  {isActive('/offers') ? (
+                    <motion.div
+                      layoutId="navbar-active-indicator"
+                      className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-teal-600 rounded-full"
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  ) : (
+                    <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-teal-600/70 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                  )}
                 </Link>
               )}
 
@@ -170,14 +227,23 @@ const Navbar = () => {
               {isAuthenticated && (
                 <Link
                   to="/messages"
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/messages')
-                      ? 'bg-teal-50 text-teal-700'
-                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'text-teal-700 font-extrabold bg-teal-50/70'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <MessageSquare className="w-3.5 h-3.5 text-teal-600" />
+                  <MessageSquare className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
                   <span>Messages</span>
+                  {isActive('/messages') ? (
+                    <motion.div
+                      layoutId="navbar-active-indicator"
+                      className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-teal-600 rounded-full"
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  ) : (
+                    <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-teal-600/70 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                  )}
                 </Link>
               )}
 
@@ -245,16 +311,16 @@ const Navbar = () => {
               </div>
             </nav>
 
-            {/* Right Action Buttons */}
+            {/* Right Action Buttons with smooth micro-interactions */}
             <div className="flex items-center gap-2">
               {/* Ultra-Lite Mode Toggle */}
               <button
                 onClick={toggleUltraLite}
                 title={ultraLite ? 'Ultra-Lite Mode active' : 'Switch to Ultra-Lite Mode (low bandwidth)'}
-                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-full border transition-all ${
+                className={`flex items-center gap-1 px-3 py-1 text-xs rounded-full border transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
                   ultraLite
-                    ? 'bg-teal-700 text-white border-teal-800 font-semibold'
-                    : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                    ? 'bg-teal-700 text-white border-teal-800 font-semibold shadow-xs'
+                    : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200/80'
                 }`}
               >
                 <Zap className={`w-3.5 h-3.5 ${ultraLite ? 'text-amber-300 fill-amber-300' : ''}`} />
@@ -264,7 +330,7 @@ const Navbar = () => {
               {/* Demo Accounts Button */}
               <button
                 onClick={() => setDemoModalOpen(true)}
-                className="hidden sm:flex items-center gap-1 px-2.5 py-1 text-xs rounded-full bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-bold"
+                className="hidden sm:flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-bold transition-all duration-200 hover:-translate-y-0.5 active:scale-95 shadow-2xs cursor-pointer"
               >
                 Demo Logins
               </button>
@@ -382,13 +448,13 @@ const Navbar = () => {
                 <div className="flex items-center gap-2">
                   <Link
                     to="/login"
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100"
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100/90 transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-600 text-white hover:bg-teal-700 shadow-sm"
+                    className="px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white hover:bg-teal-700 shadow-sm hover:shadow-lg hover:shadow-teal-500/25 transition-all duration-200 hover:-translate-y-0.5 active:scale-95 shimmer-btn-fx"
                   >
                     Join Hub
                   </Link>

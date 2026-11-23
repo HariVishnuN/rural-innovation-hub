@@ -366,13 +366,17 @@ const RegisterPage = () => {
                         whileTap={{ scale: 0.96 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                         onClick={() => setFormData({ ...formData, role: roleOption.id })}
-                        className={`p-3.5 rounded-2xl border text-center cursor-pointer transition-all ${
+                        className={`p-4 rounded-2xl border text-center cursor-pointer transition-all duration-200 group ${
                           isSelected
-                            ? 'border-teal-600 bg-teal-50/80 text-teal-950 ring-2 ring-teal-500/20 shadow-xs'
-                            : 'border-slate-200 hover:border-slate-300 bg-white'
+                            ? 'border-teal-600 bg-teal-50/90 text-teal-950 ring-2 ring-teal-500/20 shadow-soft'
+                            : 'border-slate-200 hover:border-teal-300 hover:shadow-soft bg-white'
                         }`}
                       >
-                        <Icon className={`w-5 h-5 mx-auto mb-1 ${isSelected ? 'text-teal-600' : 'text-slate-400'}`} />
+                        <div className={`w-10 h-10 mx-auto mb-2 rounded-xl flex items-center justify-center transition-all ${
+                          isSelected ? 'bg-teal-600 text-white shadow-xs' : 'bg-slate-100 text-slate-500 group-hover:bg-teal-50 group-hover:text-teal-600'
+                        }`}>
+                          <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+                        </div>
                         <div className="text-xs font-black">{roleOption.title}</div>
                         <div className="text-[10px] text-slate-500 mt-0.5">{roleOption.sub}</div>
                       </motion.div>

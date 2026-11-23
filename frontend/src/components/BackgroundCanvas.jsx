@@ -64,32 +64,38 @@ const BackgroundCanvas = () => {
       aria-hidden="true"
       className="fixed inset-0 pointer-events-none overflow-hidden -z-10 select-none"
     >
-      {/* 1. Engineering Dot-Grid Matrix */}
+      {/* 1. Engineering Architectural Dot-Grid Matrix */}
       <div
-        className="absolute inset-0 opacity-[0.4]"
+        className="absolute inset-0 opacity-[0.35]"
         style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, #94A3B8 1.1px, transparent 0)',
+          backgroundImage: 'radial-gradient(circle at 1px 1px, #94A3B8 1px, transparent 0)',
           backgroundSize: '24px 24px',
         }}
       />
 
-      {/* 2. Soft Ambient Radial Glow Orbs */}
+      {/* 2. Soft Ambient Radial Mesh Gradient Glows (Airy Mint, Sky Blue & Warm Amber) */}
       <div
-        className="absolute -top-32 -left-32 w-[540px] h-[540px] rounded-full blur-[130px] opacity-25"
+        className="absolute -top-40 -left-40 w-[650px] h-[650px] rounded-full blur-[140px] pointer-events-none opacity-40"
         style={{
-          background: 'radial-gradient(circle, rgba(13, 148, 136, 0.35) 0%, rgba(20, 184, 166, 0.08) 60%, transparent 80%)',
+          background: 'radial-gradient(circle, rgba(13, 148, 136, 0.22) 0%, rgba(20, 184, 166, 0.08) 50%, transparent 75%)',
         }}
       />
       <div
-        className="absolute top-[35%] -right-32 w-[520px] h-[520px] rounded-full blur-[130px] opacity-20"
+        className="absolute top-[20%] -right-40 w-[600px] h-[600px] rounded-full blur-[140px] pointer-events-none opacity-30"
         style={{
-          background: 'radial-gradient(circle, rgba(37, 99, 235, 0.28) 0%, rgba(59, 130, 246, 0.06) 60%, transparent 80%)',
+          background: 'radial-gradient(circle, rgba(2, 132, 199, 0.2) 0%, rgba(56, 189, 248, 0.06) 55%, transparent 75%)',
         }}
       />
       <div
-        className="absolute bottom-[-80px] left-[25%] w-[480px] h-[480px] rounded-full blur-[120px] opacity-15"
+        className="absolute top-[55%] left-[10%] w-[520px] h-[520px] rounded-full blur-[140px] pointer-events-none opacity-20"
         style={{
-          background: 'radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(13, 148, 136, 0.15) 0%, transparent 70%)',
+        }}
+      />
+      <div
+        className="absolute bottom-[-100px] right-[20%] w-[550px] h-[550px] rounded-full blur-[140px] pointer-events-none opacity-25"
+        style={{
+          background: 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%)',
         }}
       />
 

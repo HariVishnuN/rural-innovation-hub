@@ -28,6 +28,8 @@ import { useAuth } from '../../app/AuthContext';
 import apiClient from '../../api/client';
 import { Card, Badge, Button } from '../../components/Button';
 import InventionCard from '../inventions/InventionCard';
+import AnimatedCounter from '../../components/AnimatedCounter';
+import LoadingSkeleton from '../../components/LoadingSkeleton';
 
 const DashboardPage = () => {
   const { user, isInnovator, isInvestor, isAdmin, isMentor } = useAuth();
@@ -131,21 +133,27 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Metric Bar */}
+          {/* Metric Bar with Animated Numbers */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-white/10 text-xs">
             <div>
               <div className="text-slate-400 font-medium">Available Technologies</div>
-              <div className="text-xl font-black text-white font-mono">{inventions.length}</div>
+              <div className="text-xl font-black text-white font-mono">
+                <AnimatedCounter value={inventions.length} />
+              </div>
             </div>
             <div>
               <div className="text-slate-400 font-medium">Field-Tested Units</div>
               <div className="text-xl font-black text-emerald-400 font-mono">
-                {inventions.filter((i) => i.scaling_stage === 'FIELD_TESTED' || i.scaling_stage === 'MARKET_READY').length}
+                <AnimatedCounter
+                  value={inventions.filter((i) => i.scaling_stage === 'FIELD_TESTED' || i.scaling_stage === 'MARKET_READY').length}
+                />
               </div>
             </div>
             <div>
               <div className="text-slate-400 font-medium">Offers Issued by You</div>
-              <div className="text-xl font-black text-sky-400 font-mono">{offersSent.length}</div>
+              <div className="text-xl font-black text-sky-400 font-mono">
+                <AnimatedCounter value={offersSent.length} />
+              </div>
             </div>
             <div>
               <div className="text-slate-400 font-medium">Pipeline Security</div>
@@ -189,15 +197,19 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Metric Bar for Innovators */}
+          {/* Metric Bar for Innovators with Animated Counters */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-teal-700/60 text-xs">
             <div>
               <div className="text-teal-200 font-medium">My Published Units</div>
-              <div className="text-xl font-black text-white font-mono">{myInventions.length}</div>
+              <div className="text-xl font-black text-white font-mono">
+                <AnimatedCounter value={myInventions.length} />
+              </div>
             </div>
             <div>
               <div className="text-teal-200 font-medium">Incoming Commercial Offers</div>
-              <div className="text-xl font-black text-emerald-300 font-mono">{offersReceived.length}</div>
+              <div className="text-xl font-black text-emerald-300 font-mono">
+                <AnimatedCounter value={offersReceived.length} />
+              </div>
             </div>
             <div>
               <div className="text-teal-200 font-medium">IP Provenance Proofs</div>
@@ -205,7 +217,9 @@ const DashboardPage = () => {
             </div>
             <div>
               <div className="text-teal-200 font-medium">Public Showcase Feed</div>
-              <div className="text-xl font-black text-teal-300 font-mono">{inventions.length} Inventions</div>
+              <div className="text-xl font-black text-teal-300 font-mono">
+                <AnimatedCounter value={inventions.length} suffix=" Inventions" />
+              </div>
             </div>
           </div>
         </div>
@@ -372,10 +386,7 @@ const DashboardPage = () => {
       {/* 4. SHOWCASE CATALOG FEED / GRID                                 */}
       {/* ============================================================== */}
       {loading ? (
-        <div className="py-20 text-center text-xs text-slate-400 space-y-2">
-          <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p>Loading grassroots showcase feed...</p>
-        </div>
+        <LoadingSkeleton count={viewLayout === 'feed' ? 3 : 6} type={viewLayout === 'feed' ? 'feed' : 'card'} />
       ) : inventions.length === 0 ? (
         <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-3">
           <p className="text-xs text-slate-500">No inventions matched your filter criteria.</p>

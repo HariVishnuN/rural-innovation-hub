@@ -135,7 +135,7 @@ const InteractiveBlueprint3D = ({
         }
         transition={{ type: 'spring', damping: 20, stiffness: 220 }}
         style={{ transformStyle: 'preserve-3d' }}
-        className="relative bg-slate-900 rounded-3xl border-2 border-teal-500/40 shadow-2xl overflow-hidden p-5 sm:p-7 text-white select-none"
+        className="relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-3xl border-2 border-teal-500/30 hover:border-teal-400/80 shadow-2xl hover:shadow-[0_20px_50px_rgba(13,148,136,0.18)] transition-all duration-300 overflow-hidden p-5 sm:p-7 text-white select-none"
       >
         {/* Specular Interactive Glass Glare */}
         {!ultraLite && (
@@ -160,43 +160,37 @@ const InteractiveBlueprint3D = ({
             </span>
           </div>
 
-          {/* Mode Switcher Tabs */}
-          <div className="flex items-center bg-slate-800/80 p-1 rounded-xl border border-slate-700/80 text-xs font-bold">
-            <button
-              onClick={() => setActiveMode('schematic')}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                activeMode === 'schematic'
-                  ? 'bg-teal-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Schematic</span>
-            </button>
-
-            <button
-              onClick={() => setActiveMode('cinemagraph')}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                activeMode === 'cinemagraph'
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Cinemagraph</span>
-            </button>
-
-            <button
-              onClick={() => setActiveMode('stopmotion')}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                activeMode === 'stopmotion'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Stop-Motion</span>
-            </button>
+          {/* Mode Switcher Tabs with Animated Sliding Pill */}
+          <div className="flex items-center bg-slate-800/80 backdrop-blur-xs p-1 rounded-xl border border-slate-700/80 text-xs font-bold relative">
+            {[
+              { id: 'schematic', label: 'Schematic', icon: Cpu, activeBg: 'bg-teal-600' },
+              { id: 'cinemagraph', label: 'Cinemagraph', icon: Sparkles, activeBg: 'bg-sky-600' },
+              { id: 'stopmotion', label: 'Stop-Motion', icon: Layers, activeBg: 'bg-amber-600' },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeMode === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveMode(tab.id)}
+                  className={`relative px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer z-10 ${
+                    isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="blueprint-tab-pill"
+                      className={`absolute inset-0 ${tab.activeBg} rounded-lg shadow-sm`}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{tab.label}</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 

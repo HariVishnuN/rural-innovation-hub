@@ -301,7 +301,7 @@ const DiscoverPage = () => {
 
       {/* Main Feed Content with Staggered Cascading Reveal */}
       {loading ? (
-        <LoadingSkeleton count={4} />
+        <LoadingSkeleton count={viewMode === 'feed' ? 3 : 6} type={viewMode === 'feed' ? 'feed' : 'card'} />
       ) : inventions.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
