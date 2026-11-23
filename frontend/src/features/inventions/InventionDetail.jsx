@@ -43,6 +43,7 @@ import AudioPlayer from '../../components/AudioPlayer';
 import Modal from '../../components/Modal';
 import PledgeModal from '../funding/PledgeModal';
 import CommercialOfferModal from '../offers/CommercialOfferModal';
+import { DEFAULT_INVENTIONS } from '../../data/defaultInventions';
 
 const DEFAULT_INVENTION_IMG = "/images/inventions/solar-drip.svg";
 const DEFAULT_BLUEPRINT_IMG = "/images/blueprints/solar-drip-blueprint.svg";
@@ -139,12 +140,25 @@ const InventionDetail = () => {
     try {
       setLoading(true);
       const res = await apiClient.get(`/inventions/${id}`);
-      setInvention(res.data);
-      if (res.data?.region) {
-        setRepData((prev) => ({ ...prev, state: res.data.region }));
+      if (res.data) {
+        setInvention(res.data);
+        if (res.data?.region) {
+          setRepData((prev) => ({ ...prev, state: res.data.region }));
+        }
+      } else {
+        throw new Error('Empty response');
       }
     } catch (e) {
-      console.error('Error fetching invention', e);
+      console.warn('Backend load failed, searching in verified reference innovations:', e);
+      const fallback = DEFAULT_INVENTIONS.find(
+        (inv) => String(inv.id) === String(id) || inv.title.toLowerCase().includes(String(id).toLowerCase())
+      );
+      if (fallback) {
+        setInvention(fallback);
+        if (fallback.region) {
+          setRepData((prev) => ({ ...prev, state: fallback.region }));
+        }
+      }
     } finally {
       setLoading(false);
     }

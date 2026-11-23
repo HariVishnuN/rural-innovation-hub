@@ -38,6 +38,21 @@ async def lifespan(app: FastAPI):
     # Startup: Initialize tables on MySQL
     logger.info("Initializing Rural Innovation Hub backend...")
     init_db()
+
+    # Automatically ensure default grassroots inventions exist
+    try:
+        from app.db.session import SessionLocal
+        from app.models.invention import Invention
+        with SessionLocal() as db:
+            active_count = db.query(Invention).filter(Invention.is_deleted == False).count()
+            if active_count == 0:
+                logger.info("Database has 0 inventions. Running automatic seed for default reference innovations...")
+                from seed import seed_database
+                seed_database()
+                logger.info("Default grassroots innovations auto-seeded successfully!")
+    except Exception as seed_err:
+        logger.warning(f"Auto-seed check notice: {seed_err}")
+
     logger.info("Rural Innovation Hub backend ready to accept traffic.")
     yield
     # Shutdown

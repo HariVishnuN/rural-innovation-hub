@@ -32,10 +32,11 @@ def seed_database():
 
     db = SessionLocal()
     try:
-        force_reseed = "--force" in sys.argv or "-f" in sys.argv
+        force_reseed = ("--force" in sys.argv or "-f" in sys.argv) if hasattr(sys, "argv") else False
         existing_users = db.query(User).count()
+        existing_inventions = db.query(Invention).filter(Invention.is_deleted == False).count()
 
-        if existing_users > 0 and not force_reseed:
+        if existing_users > 0 and existing_inventions >= 8 and not force_reseed:
             print(f"Database already contains {existing_users} users. Updating records with local matching assets & stages...")
             # Update existing inventions with exact matching local SVG assets and scaling stages
             inv_map = {

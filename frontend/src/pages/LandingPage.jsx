@@ -24,11 +24,12 @@ import InteractiveBlueprint3D from '../components/InteractiveBlueprint3D';
 import AnimatedCounter from '../components/AnimatedCounter';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { useUltraLite } from '../app/UltraLiteContext';
+import { DEFAULT_INVENTIONS } from '../data/defaultInventions';
 
 const LandingPage = () => {
   const { ultraLite } = useUltraLite();
   const [summary, setSummary] = useState(null);
-  const [featuredInventions, setFeaturedInventions] = useState([]);
+  const [featuredInventions, setFeaturedInventions] = useState(DEFAULT_INVENTIONS.slice(0, 6));
   const [loading, setLoading] = useState(true);
 
   const { scrollY } = useScroll();
@@ -39,8 +40,24 @@ const LandingPage = () => {
     // Live SQL impact counters from backend
     setLoading(true);
     Promise.all([
-      apiClient.get('/impact/summary').then((res) => setSummary(res.data)).catch(() => {}),
-      apiClient.get('/inventions/featured').then((res) => setFeaturedInventions(res.data)).catch(() => {}),
+      apiClient
+        .get('/impact/summary')
+        .then((res) => {
+          if (res.data) setSummary(res.data);
+        })
+        .catch(() => {}),
+      apiClient
+        .get('/inventions/featured')
+        .then((res) => {
+          if (Array.isArray(res.data) && res.data.length > 0) {
+            setFeaturedInventions(res.data);
+          } else {
+            setFeaturedInventions(DEFAULT_INVENTIONS.slice(0, 6));
+          }
+        })
+        .catch(() => {
+          setFeaturedInventions(DEFAULT_INVENTIONS.slice(0, 6));
+        }),
     ]).finally(() => setLoading(false));
   }, []);
 

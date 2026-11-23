@@ -14,25 +14,27 @@ import {
   Layers,
   Wrench,
   Compass,
+  RotateCcw,
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import { useAuth } from '../../app/AuthContext';
 import { useUltraLite } from '../../app/UltraLiteContext';
 import InventionCard from '../inventions/InventionCard';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
+import { DEFAULT_INVENTIONS } from '../../data/defaultInventions';
 
 const DiscoverPage = () => {
   const { user } = useAuth();
   const { ultraLite } = useUltraLite();
-  const [inventions, setInventions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [inventions, setInventions] = useState(DEFAULT_INVENTIONS);
+  const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState('feed'); // 'feed' | 'grid'
 
   // Filters
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('All');
   const [region, setRegion] = useState('All');
-  const [maxCost, setMaxCost] = useState(25000);
+  const [maxCost, setMaxCost] = useState(50000);
   const [sortBy, setSortBy] = useState('newest');
 
   // Parallax Header Drift
@@ -66,6 +68,71 @@ const DiscoverPage = () => {
     fetchInventions();
   }, [category, region, maxCost, sortBy]);
 
+  const applyClientFiltersAndSort = (items) => {
+    let filtered = [...items];
+
+    if (keyword.trim()) {
+      const term = keyword.trim().toLowerCase();
+      filtered = filtered.filter(
+        (inv) =>
+          inv.title?.toLowerCase().includes(term) ||
+          inv.description?.toLowerCase().includes(term) ||
+          inv.creator_name?.toLowerCase().includes(term) ||
+          inv.category?.toLowerCase().includes(term) ||
+          inv.region?.toLowerCase().includes(term)
+      );
+    }
+
+    if (category !== 'All') {
+      filtered = filtered.filter(
+        (inv) => inv.category?.toLowerCase() === category.toLowerCase()
+      );
+    }
+
+    if (region !== 'All') {
+      filtered = filtered.filter((inv) =>
+        (inv.region || inv.creator_state || '')
+          .toLowerCase()
+          .includes(region.toLowerCase())
+      );
+    }
+
+    if (maxCost && maxCost > 0) {
+      filtered = filtered.filter(
+        (inv) => parseFloat(inv.total_cost || 0) <= maxCost
+      );
+    }
+
+    // Sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'most_liked':
+          return (Number(b.likes_count) || 0) - (Number(a.likes_count) || 0);
+        case 'popular':
+          return (Number(b.views_count) || 0) - (Number(a.views_count) || 0);
+        case 'oldest':
+          return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+        case 'cost_asc':
+          return parseFloat(a.total_cost || 0) - parseFloat(b.total_cost || 0);
+        case 'cost_desc':
+          return parseFloat(b.total_cost || 0) - parseFloat(a.total_cost || 0);
+        case 'title_asc':
+          return (a.title || '').localeCompare(b.title || '');
+        case 'title_desc':
+          return (b.title || '').localeCompare(a.title || '');
+        case 'innovator_asc':
+          return (a.creator_name || '').localeCompare(b.creator_name || '');
+        case 'field_tested':
+          return (b.field_tested ? 1 : 0) - (a.field_tested ? 1 : 0);
+        case 'newest':
+        default:
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      }
+    });
+
+    return filtered;
+  };
+
   const fetchInventions = async () => {
     setLoading(true);
     try {
@@ -77,12 +144,39 @@ const DiscoverPage = () => {
         keyword: keyword.trim() || undefined,
       };
       const res = await apiClient.get('/inventions', { params });
-      setInventions(res.data);
+      
+      let combined = Array.isArray(res.data) ? [...res.data] : [];
+      
+      // Merge with default reference inventions so they are NEVER missing
+      const existingTitles = new Set(
+        combined.map((inv) => (inv.title || '').trim().toLowerCase())
+      );
+      
+      for (const defInv of DEFAULT_INVENTIONS) {
+        if (!existingTitles.has(defInv.title.trim().toLowerCase())) {
+          combined.push(defInv);
+          existingTitles.add(defInv.title.trim().toLowerCase());
+        }
+      }
+
+      const finalInventions = applyClientFiltersAndSort(combined);
+      setInventions(finalInventions);
     } catch (e) {
-      console.warn('Failed to fetch inventions', e);
+      console.warn('Backend unavailable, using verified reference inventions:', e);
+      // Fallback gracefully to default inventions with active filters and sorting
+      const finalInventions = applyClientFiltersAndSort(DEFAULT_INVENTIONS);
+      setInventions(finalInventions);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResetFilters = () => {
+    setKeyword('');
+    setCategory('All');
+    setRegion('All');
+    setMaxCost(50000);
+    setSortBy('newest');
   };
 
   const handleSearchSubmit = (e) => {
@@ -306,10 +400,24 @@ const DiscoverPage = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="py-16 text-center space-y-3 bg-white rounded-2xl border border-slate-200 p-8 shadow-xs"
+          className="py-16 text-center space-y-4 bg-white rounded-3xl border border-slate-200/90 p-8 shadow-soft max-w-xl mx-auto"
         >
-          <p className="text-sm font-bold text-slate-800">No innovations matched your current filters.</p>
-          <p className="text-xs text-slate-500">Try adjusting your keyword, state, or widening your maximum budget.</p>
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shadow-xs">
+            <Sparkles className="w-6 h-6 text-teal-600" />
+          </div>
+          <div>
+            <p className="text-base font-extrabold text-slate-900">No innovations match your specific filter.</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Try widening your budget, clearing your keyword, or click below to restore all verified blueprints.
+            </p>
+          </div>
+          <button
+            onClick={handleResetFilters}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-teal-600 hover:bg-teal-700 text-white shadow-soft hover:shadow-teal-500/25 transition-all cursor-pointer"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Reset Filters & Show All Reference Innovations</span>
+          </button>
         </motion.div>
       ) : viewMode === 'feed' ? (
         /* LinkedIn Single-Column Feed with Staggered Animations */

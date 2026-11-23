@@ -30,6 +30,7 @@ import { Card, Badge, Button } from '../../components/Button';
 import InventionCard from '../inventions/InventionCard';
 import AnimatedCounter from '../../components/AnimatedCounter';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
+import { DEFAULT_INVENTIONS } from '../../data/defaultInventions';
 
 const DashboardPage = () => {
   const { user, isInnovator, isInvestor, isAdmin, isMentor } = useAuth();
@@ -64,12 +65,22 @@ const DashboardPage = () => {
       if (searchKeyword) params.append('keyword', searchKeyword);
 
       const [invRes, recOffersRes, sentOffersRes] = await Promise.all([
-        apiClient.get(`/inventions?${params.toString()}`),
+        apiClient.get(`/inventions?${params.toString()}`).catch(() => ({ data: [] })),
         apiClient.get('/offers/received').catch(() => ({ data: [] })),
         apiClient.get('/offers/sent').catch(() => ({ data: [] })),
       ]);
 
-      const allInvs = invRes.data || [];
+      let allInvs = Array.isArray(invRes.data) && invRes.data.length > 0 ? [...invRes.data] : [];
+      
+      // Always ensure the default reference inventions are present
+      const existingTitles = new Set(allInvs.map((inv) => (inv.title || '').trim().toLowerCase()));
+      for (const defInv of DEFAULT_INVENTIONS) {
+        if (!existingTitles.has(defInv.title.trim().toLowerCase())) {
+          allInvs.push(defInv);
+          existingTitles.add(defInv.title.trim().toLowerCase());
+        }
+      }
+
       setInventions(allInvs);
       setOffersReceived(recOffersRes.data || []);
       setOffersSent(sentOffersRes.data || []);
@@ -78,7 +89,8 @@ const DashboardPage = () => {
         setMyInventions(allInvs.filter((inv) => String(inv.creator_id) === String(user.id)));
       }
     } catch (e) {
-      console.warn('Dashboard load error:', e);
+      console.warn('Dashboard load error, falling back to default inventions:', e);
+      setInventions(DEFAULT_INVENTIONS);
     } finally {
       setLoading(false);
     }
