@@ -1,4 +1,5 @@
 import React from 'react';
+import { useUltraLite } from '../app/UltraLiteContext';
 
 /**
  * LoadingSkeleton
@@ -9,7 +10,10 @@ import React from 'react';
  * - 'detail': Full page invention blueprint detail skeleton
  */
 export const LoadingSkeleton = ({ count = 3, type = 'card' }) => {
-  const shimmerClass = 'relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.6s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
+  const { ultraLite } = useUltraLite();
+  const shimmerClass = ultraLite
+    ? ''
+    : 'relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.6s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
 
   if (type === 'stats') {
     return (

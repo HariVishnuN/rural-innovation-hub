@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './app/AuthContext';
 import { UltraLiteProvider } from './app/UltraLiteContext';
 import { OfflineProvider } from './app/OfflineContext';
+import { ToastProvider } from './components/Toast';
 import { AppRoutes } from './app/routes';
 
 function App() {
@@ -11,7 +12,9 @@ function App() {
       <AuthProvider>
         <UltraLiteProvider>
           <OfflineProvider>
-            <AppRoutes />
+            <ToastProvider>
+              <AppRoutes />
+            </ToastProvider>
           </OfflineProvider>
         </UltraLiteProvider>
       </AuthProvider>

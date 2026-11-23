@@ -22,10 +22,12 @@ import { useUltraLite } from '../../app/UltraLiteContext';
 import InventionCard from '../inventions/InventionCard';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
 import { DEFAULT_INVENTIONS } from '../../data/defaultInventions';
+import { useToast } from '../../components/Toast';
 
 const DiscoverPage = () => {
   const { user } = useAuth();
   const { ultraLite } = useUltraLite();
+  const { showToast } = useToast();
   const [inventions, setInventions] = useState(DEFAULT_INVENTIONS);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState('feed'); // 'feed' | 'grid'
@@ -177,6 +179,7 @@ const DiscoverPage = () => {
     setRegion('All');
     setMaxCost(50000);
     setSortBy('newest');
+    showToast('🔄 Filters reset to all verified innovations', 'reset');
   };
 
   const handleSearchSubmit = (e) => {
@@ -184,20 +187,20 @@ const DiscoverPage = () => {
     fetchInventions();
   };
 
-  // Staggered Container Animation Variants
+  // Staggered Container Animation Variants (40-60ms gentle glide)
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: ultraLite ? 0 : 0.07,
+        staggerChildren: ultraLite ? 0 : 0.05,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 18 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.28, ease: 'easeOut' } },
   };
 
   return (
@@ -212,14 +215,10 @@ const DiscoverPage = () => {
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               Public Innovation Feed
             </h1>
-            <motion.span
-              animate={ultraLite ? undefined : { scale: [1, 1.05, 1] }}
-              transition={{ repeat: Infinity, duration: 3 }}
-              className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200 inline-flex items-center gap-1 shadow-2xs"
-            >
-              <Sparkles className="w-3 h-3 text-teal-600 animate-spin-slow" />
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200 inline-flex items-center gap-1 shadow-2xs">
+              <Sparkles className="w-3 h-3 text-teal-600" />
               Live Showcase
-            </motion.span>
+            </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
             Browse, like, comment, and pay to reuse grassroots machines built by village makers and agricultural innovators.
@@ -250,8 +249,8 @@ const DiscoverPage = () => {
           {/* Animated View Mode Toggle */}
           <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-2xs">
             <motion.button
-              whileTap={{ scale: 0.94 }}
-              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              whileHover={{ y: -1 }}
               onClick={() => setViewMode('feed')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'feed'
@@ -263,8 +262,8 @@ const DiscoverPage = () => {
               <span>Feed View</span>
             </motion.button>
             <motion.button
-              whileTap={{ scale: 0.94 }}
-              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              whileHover={{ y: -1 }}
               onClick={() => setViewMode('grid')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'grid'
@@ -277,16 +276,16 @@ const DiscoverPage = () => {
             </motion.button>
           </div>
 
-          {/* Animated Showcase Invention Button */}
+          {/* Tactile Press & Elevation on Showcase Invention Button */}
           <Link to="/inventions/new">
             <motion.div
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-teal-500/30 transition-all shimmer-btn-fx cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-teal-500/25 transition-all cursor-pointer"
             >
               <PlusCircle className="w-4 h-4 text-amber-300" />
-              <span>Showcase Invention</span>
+              <span>+ Showcase New Invention Now</span>
             </motion.div>
           </Link>
         </div>

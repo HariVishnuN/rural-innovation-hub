@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../app/AuthContext';
 import { useUltraLite } from '../../app/UltraLiteContext';
+import { useToast } from '../../components/Toast';
 import apiClient from '../../api/client';
 import CommercialOfferModal from '../offers/CommercialOfferModal';
 
@@ -60,6 +61,7 @@ export const getScalingStageBadge = (stage) => {
 const InventionCard = ({ invention, onUpdate }) => {
   const { user } = useAuth();
   const { ultraLite } = useUltraLite();
+  const { showToast } = useToast();
   const [imgError, setImgError] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
 
@@ -83,40 +85,12 @@ const InventionCard = ({ invention, onUpdate }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
 
-  // Faux 3D Tilt & Specular Glare Coordinates
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
-  const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
-
-  const handleCardMouseMove = (e) => {
-    if (ultraLite) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rX = ((y - centerY) / centerY) * -6;
-    const rY = ((x - centerX) / centerX) * 6;
-    setRotateX(rX);
-    setRotateY(rY);
-    setGlarePos({
-      x: (x / rect.width) * 100,
-      y: (y / rect.height) * 100,
-      opacity: 0.12,
-    });
-  };
-
-  const handleCardMouseLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
-    setGlarePos((prev) => ({ ...prev, opacity: 0 }));
-  };
-
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
       await apiClient.delete(`/inventions/${invention.id}`);
       setIsDeleted(true);
+      showToast('🗑️ Invention deleted successfully', 'info');
     } catch (err) {
       alert(err.response?.data?.detail || 'Failed to delete invention.');
       setIsDeleting(false);
@@ -142,18 +116,22 @@ const InventionCard = ({ invention, onUpdate }) => {
       })
     : 'Recent Post';
 
-  // Toggle Like Handler
+  // Toggle Like Handler with Micro-Feedback Pop & Toast
   const handleLike = async () => {
     if (!user) {
       alert('Please sign in to like grassroots innovations.');
       return;
     }
 
-    // Optimistic UI update
     const previousLiked = isLiked;
     const previousCount = likesCount;
-    setIsLiked(!previousLiked);
+    const nextLiked = !previousLiked;
+    setIsLiked(nextLiked);
     setLikesCount(previousLiked ? Math.max(0, previousCount - 1) : previousCount + 1);
+
+    if (nextLiked) {
+      showToast('❤️ Added to your appreciated innovations', 'like');
+    }
 
     try {
       const res = await apiClient.post(`/inventions/${invention.id}/like`);
@@ -235,21 +213,24 @@ const InventionCard = ({ invention, onUpdate }) => {
       setComments((prev) => [...prev, localComment]);
       setCommentsCount((prev) => prev + 1);
       setNewCommentText('');
+      showToast('💬 Comment posted to discussion', 'comment');
     } finally {
       setCommentSubmitting(false);
     }
   };
 
-  // Share link
+  // Share link with Toast confirmation
   const handleShare = () => {
     const shareUrl = `${window.location.origin}/inventions/${invention.id}`;
     navigator.clipboard?.writeText(shareUrl);
     setCopied(true);
+    showToast('📋 Blueprint link copied to clipboard', 'share');
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleOfferSuccess = () => {
     setPaidReusesCount((prev) => prev + 1);
+    showToast('🤝 Offer submitted to innovator!', 'info');
     if (onUpdate) onUpdate();
   };
 
@@ -259,24 +240,10 @@ const InventionCard = ({ invention, onUpdate }) => {
 
   return (
     <motion.div
-      onMouseMove={handleCardMouseMove}
-      onMouseLeave={handleCardMouseLeave}
-      animate={ultraLite ? { y: 0 } : { rotateX, rotateY }}
-      whileHover={ultraLite ? { y: -4 } : { y: -6 }}
-      transition={{ type: 'spring', damping: 20, stiffness: 220 }}
-      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
-      className="relative bg-white rounded-3xl border border-slate-200/90 shadow-soft hover:shadow-xl hover:border-teal-300/80 transition-all duration-300 overflow-hidden flex flex-col group"
+      whileHover={ultraLite ? undefined : { y: -3 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="relative bg-white rounded-3xl border border-slate-200/90 shadow-soft hover:shadow-lifted hover:border-teal-300 transition-all duration-200 overflow-hidden flex flex-col group"
     >
-      {/* Specular Interactive Glass Glare */}
-      {!ultraLite && glarePos.opacity > 0 && (
-        <div
-          className="absolute inset-0 pointer-events-none transition-opacity duration-200 z-30"
-          style={{
-            opacity: glarePos.opacity,
-            background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 70%)`,
-          }}
-        />
-      )}
       {/* LinkedIn-Style Post Header */}
       <div className="p-4 sm:p-5 pb-3 flex items-start justify-between gap-3 border-b border-slate-50">
         <div className="flex items-center gap-3">
@@ -373,12 +340,16 @@ const InventionCard = ({ invention, onUpdate }) => {
               <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/0 via-teal-400/10 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="absolute -inset-full top-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 group-hover:animate-shimmer pointer-events-none" />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/95 text-slate-900 text-xs font-bold shadow-md">
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4">
+                <motion.span
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white text-slate-900 text-xs font-bold shadow-md cursor-pointer"
+                >
                   <span>View Blueprints & Video</span>
                   <ExternalLink className="w-3.5 h-3.5 text-teal-600" />
-                </span>
-                <span className="px-2 py-1 rounded bg-teal-900/80 text-teal-200 text-[10px] font-mono font-bold border border-teal-500/30 backdrop-blur-xs">
+                </motion.span>
+                <span className="px-2.5 py-1 rounded-md bg-slate-900 text-teal-300 text-[10px] font-mono font-bold border border-teal-500/40 shadow-xs">
                   Cinemagraph Preview
                 </span>
               </div>
@@ -427,7 +398,7 @@ const InventionCard = ({ invention, onUpdate }) => {
         </div>
 
         <div className="flex items-center gap-3 text-[11px]">
-          <button onClick={toggleComments} className="hover:underline text-slate-600">
+          <button onClick={toggleComments} className="hover:underline text-slate-600 cursor-pointer">
             {commentsCount} {commentsCount === 1 ? 'Comment' : 'Comments'}
           </button>
           <span>•</span>
@@ -439,9 +410,9 @@ const InventionCard = ({ invention, onUpdate }) => {
 
       {/* LinkedIn Interactive Action Bar */}
       <div className="px-2 sm:px-4 py-1.5 grid grid-cols-4 gap-1.5 border-b border-slate-100">
-        {/* Like Button */}
+        {/* Like Button with 180ms pop */}
         <motion.button
-          whileTap={{ scale: 0.8 }}
+          whileTap={{ scale: 0.92 }}
           whileHover={{ scale: 1.05 }}
           onClick={handleLike}
           className={`flex items-center justify-center gap-1.5 py-2 rounded-lg font-semibold text-xs transition-all cursor-pointer ${
@@ -451,17 +422,17 @@ const InventionCard = ({ invention, onUpdate }) => {
           }`}
         >
           <motion.div
-            animate={isLiked ? { scale: [1, 1.45, 0.9, 1] } : { scale: 1 }}
-            transition={{ duration: 0.35 }}
+            animate={isLiked ? { scale: [1, 1.25, 1] } : { scale: 1 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
           >
             <Heart className={`w-4 h-4 ${isLiked ? 'fill-red-600 text-red-600' : ''}`} />
           </motion.div>
           <span className="hidden sm:inline">{likesCount}</span>
         </motion.button>
 
-        {/* Comment Button */}
+        {/* Comment Button with tactile press */}
         <motion.button
-          whileTap={{ scale: 0.93 }}
+          whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.03 }}
           onClick={toggleComments}
           className={`flex items-center justify-center gap-1.5 py-2 rounded-lg font-semibold text-xs transition-colors cursor-pointer ${
@@ -474,9 +445,9 @@ const InventionCard = ({ invention, onUpdate }) => {
           <span className="hidden sm:inline">Comment</span>
         </motion.button>
 
-        {/* Share Button */}
+        {/* Share Button with tactile press */}
         <motion.button
-          whileTap={{ scale: 0.93 }}
+          whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.03 }}
           onClick={handleShare}
           className="flex items-center justify-center gap-1.5 py-2 rounded-lg font-semibold text-xs text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
@@ -489,18 +460,19 @@ const InventionCard = ({ invention, onUpdate }) => {
         {/* Buy / Rent / Pay to Reuse CTA or View Offers + Delete for Owner */}
         {isMyInvention ? (
           <div className="flex items-center gap-1">
-            <Link
-              to="/profile?tab=offers"
-              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs hover:shadow-emerald-500/25 transition-all shimmer-btn-fx"
-              title="View incoming commercial offers for your invention"
-            >
-              <Eye className="w-3.5 h-3.5 text-emerald-200" />
-              <span className="truncate">Offers ({paidReusesCount})</span>
-            </Link>
+            <motion.div whileHover={{ y: -1, scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+              <Link
+                to="/profile?tab=offers"
+                className="w-full flex items-center justify-center gap-1 py-2 rounded-lg font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs hover:shadow-emerald-500/25 transition-all"
+                title="View incoming commercial offers for your invention"
+              >
+                <Eye className="w-3.5 h-3.5 text-emerald-200" />
+                <span className="truncate">Offers ({paidReusesCount})</span>
+              </Link>
+            </motion.div>
             <motion.button
               whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.08, y: -1 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+              whileHover={{ scale: 1.05 }}
               onClick={() => setIsDeleteModalOpen(true)}
               className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-colors cursor-pointer"
               title="Delete this invention"
@@ -510,11 +482,10 @@ const InventionCard = ({ invention, onUpdate }) => {
           </div>
         ) : (
           <motion.button
-            whileTap={{ scale: 0.93 }}
-            whileHover={{ scale: 1.04, y: -1 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            whileTap={{ scale: 0.98 }}
+            whileHover={{ y: -1, scale: 1.02 }}
             onClick={() => setIsOfferModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 py-2 rounded-lg font-bold text-xs bg-teal-600 hover:bg-teal-700 text-white shadow-xs hover:shadow-teal-500/25 transition-all cursor-pointer shimmer-btn-fx"
+            className="flex items-center justify-center gap-1.5 py-2 rounded-lg font-bold text-xs bg-teal-600 hover:bg-teal-700 text-white shadow-xs hover:shadow-teal-500/25 transition-all cursor-pointer"
             title="Buy, rent, or pay to reuse this invention"
           >
             <Handshake className="w-4 h-4 text-amber-300" />
@@ -523,67 +494,79 @@ const InventionCard = ({ invention, onUpdate }) => {
         )}
       </div>
 
-      {/* Inline Comments Drawer (Expandable) */}
-      {showComments && (
-        <div className="bg-slate-50/80 p-4 border-t border-slate-100 space-y-3 animate-fade-in text-xs">
-          {/* New Comment Input */}
-          <form onSubmit={handleCommentSubmit} className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-xs">
-              {user ? user.full_name?.charAt(0) : '?'}
-            </div>
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={newCommentText}
-                onChange={(e) => setNewCommentText(e.target.value)}
-                placeholder={user ? "Write a supportive comment or question..." : "Sign in to post a comment..."}
-                disabled={!user || commentSubmitting}
-                className="w-full pl-3 pr-10 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-slate-100"
-              />
-              <button
-                type="submit"
-                disabled={!user || !newCommentText.trim() || commentSubmitting}
-                className="absolute right-1.5 top-1.5 p-1 rounded-lg bg-teal-600 text-white disabled:opacity-40 hover:bg-teal-700 transition-colors"
-              >
-                <Send className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </form>
-
-          {/* Comments List */}
-          {commentsLoading ? (
-            <div className="text-center py-4 text-[11px] text-slate-400">Loading comments...</div>
-          ) : comments.length === 0 ? (
-            <div className="text-center py-3 text-[11px] text-slate-400">
-              No comments yet. Be the first to start the discussion!
-            </div>
-          ) : (
-            <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-              {comments.map((c) => (
-                <div key={c.id} className="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900">{c.user_name}</span>
-                      {c.user_role && (
-                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-semibold">
-                          {c.user_role}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] text-slate-400">
-                      {new Date(c.created_at).toLocaleDateString('en-IN', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-700 leading-relaxed">{c.comment_text}</p>
+      {/* Inline Comments Accordion Drawer (Smooth Height Expand/Collapse) */}
+      <AnimatePresence>
+        {showComments && (
+          <motion.div
+            key="comments-drawer"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="overflow-hidden bg-slate-50/90 border-t border-slate-100"
+          >
+            <div className="p-4 space-y-3 text-xs">
+              {/* New Comment Input */}
+              <form onSubmit={handleCommentSubmit} className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-xs">
+                  {user ? user.full_name?.charAt(0) : '?'}
                 </div>
-              ))}
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    value={newCommentText}
+                    onChange={(e) => setNewCommentText(e.target.value)}
+                    placeholder={user ? "Write a supportive comment or question..." : "Sign in to post a comment..."}
+                    disabled={!user || commentSubmitting}
+                    className="w-full pl-3 pr-10 py-2 rounded-xl border border-slate-300 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-slate-100"
+                  />
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    type="submit"
+                    disabled={!user || !newCommentText.trim() || commentSubmitting}
+                    className="absolute right-1.5 top-1.5 p-1 rounded-lg bg-teal-600 text-white disabled:opacity-40 hover:bg-teal-700 transition-colors"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </motion.button>
+                </div>
+              </form>
+
+              {/* Comments List */}
+              {commentsLoading ? (
+                <div className="text-center py-4 text-[11px] text-slate-400">Loading comments...</div>
+              ) : comments.length === 0 ? (
+                <div className="text-center py-3 text-[11px] text-slate-400">
+                  No comments yet. Be the first to start the discussion!
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                  {comments.map((c) => (
+                    <div key={c.id} className="p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs space-y-1">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-slate-900">{c.user_name}</span>
+                          {c.user_role && (
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-semibold">
+                              {c.user_role}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-400">
+                          {new Date(c.created_at).toLocaleDateString('en-IN', {
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-700 leading-relaxed">{c.comment_text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Commercial Offer / Buy / Rent Modal */}
       <CommercialOfferModal

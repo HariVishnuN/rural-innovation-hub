@@ -246,12 +246,8 @@ const LandingPage = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-            {/* Stat 1: Documented Blueprints */}
-            <motion.div
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.2 }}
-              className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 hover:border-teal-200 hover:bg-teal-50/30 transition-all space-y-1"
-            >
+            {/* Stat 1: Documented Blueprints (Static summary stat - no button lift) */}
+            <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-1">
               <div className="text-3xl sm:text-4xl font-extrabold text-teal-700 font-mono tracking-tight">
                 <AnimatedCounter
                   value={summary ? summary.total_inventions : 8}
@@ -261,14 +257,10 @@ const LandingPage = () => {
               <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
                 Documented Blueprints
               </div>
-            </motion.div>
+            </div>
 
-            {/* Stat 2: Field Replications */}
-            <motion.div
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.2 }}
-              className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 hover:border-sky-200 hover:bg-sky-50/30 transition-all space-y-1"
-            >
+            {/* Stat 2: Field Replications (Static summary stat - no button lift) */}
+            <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-1">
               <div className="text-3xl sm:text-4xl font-extrabold text-sky-700 font-mono tracking-tight">
                 <AnimatedCounter
                   value={summary ? summary.total_replications : 3}
@@ -278,14 +270,10 @@ const LandingPage = () => {
               <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
                 Field Replications
               </div>
-            </motion.div>
+            </div>
 
-            {/* Stat 3: CO₂ Avoided */}
-            <motion.div
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.2 }}
-              className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all space-y-1"
-            >
+            {/* Stat 3: CO₂ Avoided (Static summary stat - no button lift) */}
+            <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-1">
               <div className="text-3xl sm:text-4xl font-extrabold text-emerald-700 font-mono tracking-tight">
                 <AnimatedCounter
                   value={summary ? parseFloat(summary.total_co2_saved_kg) / 1000 : 3.2}
@@ -296,14 +284,10 @@ const LandingPage = () => {
               <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
                 CO₂ Emissions Avoided
               </div>
-            </motion.div>
+            </div>
 
-            {/* Stat 4: Pledged Support */}
-            <motion.div
-              whileHover={{ y: -3 }}
-              transition={{ duration: 0.2 }}
-              className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 hover:border-amber-200 hover:bg-amber-50/30 transition-all space-y-1"
-            >
+            {/* Stat 4: Pledged Support (Static summary stat - no button lift) */}
+            <div className="p-4 rounded-2xl bg-slate-50/60 border border-slate-100 space-y-1">
               <div className="text-3xl sm:text-4xl font-extrabold text-amber-700 font-mono tracking-tight">
                 <AnimatedCounter
                   value={summary ? parseFloat(summary.total_funding_pledged) : 40000}
@@ -313,7 +297,7 @@ const LandingPage = () => {
               <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
                 Pledged Support
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </motion.section>
