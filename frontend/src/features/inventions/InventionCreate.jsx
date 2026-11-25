@@ -22,6 +22,7 @@ import apiClient from '../../api/client';
 import { useAuth } from '../../app/AuthContext';
 import { useOffline } from '../../app/OfflineContext';
 import { Button, Card, Badge } from '../../components/Button';
+import { compressImageToBase64, resolveMediaUrl } from '../../utils/media';
 
 const InventionCreate = () => {
   const { user } = useAuth();
@@ -79,14 +80,20 @@ const InventionCreate = () => {
     if (!file) return;
     setUploadingField(fieldName);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await apiClient.post('/upload', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setFormData((prev) => ({ ...prev, [fieldName]: res.data.url }));
+      if (fieldName === 'video_url' || file.type.startsWith('video/')) {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await apiClient.post('/upload', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        setFormData((prev) => ({ ...prev, [fieldName]: res.data.url }));
+      } else {
+        // Compress images/schematics directly to Base64 data URL (max 800px, 0.7 quality) for permanent MySQL storage
+        const base64DataUrl = await compressImageToBase64(file, 800, 0.7);
+        setFormData((prev) => ({ ...prev, [fieldName]: base64DataUrl }));
+      }
     } catch (err) {
-      alert(err.response?.data?.detail || 'File upload failed. Ensure the format is PNG, JPG, SVG, WebP, PDF, or MP4.');
+      alert(err.response?.data?.detail || 'File processing failed. Ensure the format is PNG, JPG, SVG, WebP, PDF, or MP4.');
     } finally {
       setUploadingField(null);
     }
@@ -453,7 +460,7 @@ const InventionCreate = () => {
                 {formData.image_url ? (
                   <div className="relative w-full h-28 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
                     <img
-                      src={formData.image_url}
+                      src={resolveMediaUrl(formData.image_url)}
                       alt="Prototype preview"
                       className="w-full h-full object-contain"
                       onError={(e) => {
@@ -518,7 +525,7 @@ const InventionCreate = () => {
                 {formData.blueprint_url ? (
                   <div className="relative w-full h-28 rounded-lg overflow-hidden bg-slate-900 border border-slate-800 p-1 flex items-center justify-center">
                     <img
-                      src={formData.blueprint_url}
+                      src={resolveMediaUrl(formData.blueprint_url)}
                       alt="Blueprint preview"
                       className="w-full h-full object-contain"
                       onError={(e) => {
@@ -583,7 +590,7 @@ const InventionCreate = () => {
                 {formData.sketch_url ? (
                   <div className="relative w-full h-28 rounded-lg overflow-hidden bg-amber-50 border border-amber-200 p-1 flex items-center justify-center">
                     <img
-                      src={formData.sketch_url}
+                      src={resolveMediaUrl(formData.sketch_url)}
                       alt="Sketch preview"
                       className="w-full h-full object-contain"
                       onError={(e) => {

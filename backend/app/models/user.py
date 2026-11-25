@@ -28,7 +28,7 @@ class User(Base):
     bio = Column(Text, nullable=True)
     skills_expertise = Column(String(255), nullable=True)
     organization_college = Column(String(150), nullable=True)
-    profile_photo_url = Column(String(500), nullable=True)
+    profile_photo_url = Column(Text, nullable=True)
     verified = Column(Boolean, default=False, index=True)
     consent_given = Column(Boolean, default=True)
     consent_timestamp = Column(DateTime, default=datetime.utcnow)

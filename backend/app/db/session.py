@@ -39,6 +39,15 @@ def init_db() -> None:
         # Check and migrate columns on existing tables
         with engine.connect() as conn:
             try:
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN image_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN blueprint_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN sketch_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE users MODIFY COLUMN profile_photo_url LONGTEXT NULL;"))
+                conn.commit()
+            except Exception:
+                pass
+
+            try:
                 conn.execute(text("ALTER TABLE inventions ADD COLUMN scaling_stage ENUM('RAW_PROTOTYPE', 'PEER_VALIDATED', 'FIELD_TESTED', 'MARKET_READY') NOT NULL DEFAULT 'RAW_PROTOTYPE' AFTER field_tested;"))
                 conn.commit()
             except Exception:
@@ -75,6 +84,15 @@ def init_db() -> None:
                 pass
 
             try:
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN image_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN blueprint_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN sketch_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE users MODIFY COLUMN profile_photo_url LONGTEXT NULL;"))
+                conn.commit()
+            except Exception as e:
+                logger.warning(f"LONGTEXT migration notice: {e}")
+
+            try:
                 conn.execute(text("ALTER TABLE commercial_offers ADD COLUMN amount_inr DECIMAL(12, 2) NULL AFTER proposed_amount;"))
                 conn.commit()
             except Exception:
@@ -91,6 +109,15 @@ def init_db() -> None:
                 conn.commit()
             except Exception:
                 pass
+
+            try:
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN image_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN blueprint_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE inventions MODIFY COLUMN sketch_url LONGTEXT NULL;"))
+                conn.execute(text("ALTER TABLE users MODIFY COLUMN profile_photo_url LONGTEXT NULL;"))
+                conn.commit()
+            except Exception as mod_err:
+                logger.warning(f"Image LONGTEXT migration notice: {mod_err}")
 
         logger.info("Database tables initialized successfully via Base.metadata.create_all().")
     except Exception as e:

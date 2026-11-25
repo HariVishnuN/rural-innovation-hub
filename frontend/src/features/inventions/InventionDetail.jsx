@@ -35,6 +35,7 @@ import {
   RotateCcw,
   Cpu,
   Info,
+  Eye,
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import { useAuth } from '../../app/AuthContext';
@@ -43,6 +44,7 @@ import AudioPlayer from '../../components/AudioPlayer';
 import Modal from '../../components/Modal';
 import PledgeModal from '../funding/PledgeModal';
 import CommercialOfferModal from '../offers/CommercialOfferModal';
+import { resolveMediaUrl, getInitials } from '../../utils/media';
 import { DEFAULT_INVENTIONS } from '../../data/defaultInventions';
 
 const DEFAULT_INVENTION_IMG = "/images/inventions/solar-drip.svg";
@@ -272,15 +274,18 @@ const InventionDetail = () => {
     );
   }
 
-  const creatorName = invention.creator_name || 'Grassroots Innovator';
-  const creatorLocation = [invention.creator_village_city, invention.creator_state || invention.region]
+  const creatorName = invention?.creator_name || 'Grassroots Innovator';
+  const creatorLocation = [invention?.creator_village_city, invention?.creator_state || invention?.region]
     .filter(Boolean)
     .join(', ');
 
-  const prototypePhoto = invention.image_url || DEFAULT_INVENTION_IMG;
-  const blueprintPhoto = invention.blueprint_url || DEFAULT_BLUEPRINT_IMG;
-  const sketchPhoto = invention.sketch_url || DEFAULT_SKETCH_IMG;
-  const videoUrl = invention.video_url || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+  const prototypePhoto = resolveMediaUrl(invention?.image_url, DEFAULT_INVENTION_IMG);
+  const blueprintPhoto = resolveMediaUrl(invention?.blueprint_url, DEFAULT_BLUEPRINT_IMG);
+  const sketchPhoto = resolveMediaUrl(invention?.sketch_url, DEFAULT_SKETCH_IMG);
+  const videoUrl = invention?.video_url || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+  const creatorLower = (creatorName || '').trim().toLowerCase();
+  const rawCreatorPhoto = invention?.creator_photo_url || (creatorLower.includes('ramesh') ? '/images/avatars/ramesh.jpg' : creatorLower.includes('kavita') ? '/images/avatars/kavita.jpg' : creatorLower.includes('suresh') ? '/images/avatars/suresh.jpg' : creatorLower.includes('hari') ? '/images/avatars/harivishnu.jpg' : DEFAULT_AVATAR);
+  const creatorPhoto = resolveMediaUrl(rawCreatorPhoto, DEFAULT_AVATAR);
 
   const currentStageKey = invention.scaling_stage || (invention.field_tested ? 'FIELD_TESTED' : 'RAW_PROTOTYPE');
   const currentStageIndex = STAGES.findIndex((s) => s.key === currentStageKey) >= 0
@@ -886,7 +891,7 @@ const InventionDetail = () => {
                       <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
                         <td className="py-3 px-3 font-semibold text-slate-900">{m.item_name}</td>
                         <td className="py-3 px-3 text-slate-600">{m.quantity}</td>
-                        <td className="py-3 px-3 font-bold text-slate-900">₹{parseFloat(m.unit_cost).toLocaleString()}</td>
+                        <td className="py-3 px-3 font-bold text-slate-900">₹{parseFloat(m.unit_cost || 0).toLocaleString()}</td>
                         <td className="py-3 px-3 text-slate-500">{m.local_source || 'Local Market'}</td>
                         <td className="py-3 px-3 text-teal-700 font-medium">
                           {m.optimized_alternative || 'Standard'}
@@ -1026,9 +1031,10 @@ const InventionDetail = () => {
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img
-                  src={invention.creator_photo_url || DEFAULT_AVATAR}
+                  src={creatorPhoto}
                   alt={creatorName}
-                  className="w-14 h-14 rounded-full object-cover ring-2 ring-teal-600 shadow-sm"
+                  onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
+                  className="w-14 h-14 min-w-[56px] min-h-[56px] rounded-full object-cover shrink-0 ring-2 ring-teal-600 shadow-sm bg-white"
                 />
                 {invention.creator_verified && (
                   <span

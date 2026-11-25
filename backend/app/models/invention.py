@@ -29,10 +29,10 @@ class Invention(Base):
     assembly_steps = Column(JSON, nullable=False)  # Array of {step: 1, title: "", details: "", audio_url: ""}
     total_cost = Column(Numeric(12, 2), nullable=False, default=0.00, index=True)
     currency = Column(String(10), default="INR")
-    image_url = Column(String(500), nullable=True)
+    image_url = Column(Text, nullable=True)
     video_url = Column(String(500), nullable=True)
-    blueprint_url = Column(String(500), nullable=True)
-    sketch_url = Column(String(500), nullable=True)
+    blueprint_url = Column(Text, nullable=True)
+    sketch_url = Column(Text, nullable=True)
     sha256_hash = Column(String(64), nullable=False, index=True)
     submission_timestamp = Column(DateTime, default=datetime.utcnow)
     moderation_status = Column(

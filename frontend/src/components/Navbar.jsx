@@ -29,6 +29,7 @@ import { useAuth } from '../app/AuthContext';
 import { useUltraLite } from '../app/UltraLiteContext';
 import { useOffline } from '../app/OfflineContext';
 import DemoAccountsModal from '../features/auth/DemoAccountsModal';
+import { resolveMediaUrl } from '../utils/media';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, isAdmin, isInnovator } = useAuth();
@@ -91,35 +92,35 @@ const Navbar = () => {
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="flex items-center justify-between h-16 gap-2">
             {/* Logo with micro hover lift */}
-            <Link to="/" className="flex items-center gap-2.5 group transition-transform hover:-translate-y-0.5 shrink-0 whitespace-nowrap">
-              <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-soft group-hover:shadow-teal-500/25 group-hover:bg-teal-700 transition-all shrink-0">
+            <Link to="/" className="flex items-center gap-2 group transition-transform hover:-translate-y-0.5 shrink-0 whitespace-nowrap">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-soft group-hover:shadow-teal-500/25 group-hover:bg-teal-700 transition-all shrink-0">
                 <Lightbulb className="w-5 h-5 text-amber-300 transition-transform group-hover:rotate-12" />
               </div>
               <div className="shrink-0">
-                <span className="font-black text-lg text-slate-900 tracking-tight flex items-center gap-1.5 leading-tight">
+                <span className="font-black text-base sm:text-lg text-slate-900 tracking-tight flex items-center gap-1.5 leading-tight">
                   Rural Innovation Hub
                 </span>
-                <span className="hidden sm:block text-[10px] text-teal-700 font-bold uppercase tracking-wider">
+                <span className="hidden xl:block text-[9px] text-teal-700 font-bold uppercase tracking-wider">
                   Showcase • Rent • Buy Hardware
                 </span>
               </div>
             </Link>
 
             {/* Desktop Navigation Links with animated hover underlines */}
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
+            <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1">
               {/* 1. Showcase Catalog */}
               <Link
                 to="/discover"
-                className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                className={`relative group flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   isActive('/discover')
                     ? 'text-teal-700 font-extrabold bg-teal-50/70'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                 }`}
               >
-                <Search className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
+                <Search className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110 shrink-0" />
                 <span>Showcase Catalog</span>
                 {isActive('/discover') ? (
                   <motion.div
@@ -135,13 +136,13 @@ const Navbar = () => {
               {/* Investors & Pitch Directory */}
               <Link
                 to="/investors"
-                className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                className={`relative group flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   isActive('/investors')
                     ? 'text-teal-700 font-extrabold bg-teal-50/70'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                 }`}
               >
-                <Users className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
+                <Users className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110 shrink-0" />
                 <span>Investors & Pitch</span>
                 {isActive('/investors') ? (
                   <motion.div
@@ -157,14 +158,14 @@ const Navbar = () => {
               {/* Patent & IP Services */}
               <Link
                 to="/patents"
-                className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                className={`relative group flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   isActive('/patents')
                     ? 'text-teal-700 font-extrabold bg-teal-50/70'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                 }`}
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
-                <span>Patent & IP Services</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110 shrink-0" />
+                <span><span className="hidden xl:inline">Patent & </span>IP Services</span>
                 {isActive('/patents') ? (
                   <motion.div
                     layoutId="navbar-active-indicator"
@@ -180,14 +181,14 @@ const Navbar = () => {
               {user?.role === 'INVESTOR' || user?.role === 'OFFICIAL' || user?.role === 'ADMIN' ? (
                 <Link
                   to="/officials"
-                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/officials')
                       ? 'text-sky-700 font-extrabold bg-sky-50/70'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <Building2 className="w-3.5 h-3.5 text-sky-600 transition-transform group-hover:scale-110" />
-                  <span>Officials Portal</span>
+                  <Building2 className="w-3.5 h-3.5 text-sky-600 transition-transform group-hover:scale-110 shrink-0" />
+                  <span><span className="hidden xl:inline">Officials </span>Portal</span>
                   {isActive('/officials') ? (
                     <motion.div
                       layoutId="navbar-active-indicator"
@@ -201,14 +202,14 @@ const Navbar = () => {
               ) : isAuthenticated ? (
                 <Link
                   to="/dashboard"
-                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/dashboard')
                       ? 'text-teal-700 font-extrabold bg-teal-50/70'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <Lightbulb className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
-                  <span>Inventor Workspace</span>
+                  <Lightbulb className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110 shrink-0" />
+                  <span><span className="hidden xl:inline">Inventor </span>Workspace</span>
                   {isActive('/dashboard') ? (
                     <motion.div
                       layoutId="navbar-active-indicator"
@@ -225,13 +226,13 @@ const Navbar = () => {
               {isAuthenticated && (
                 <Link
                   to="/offers"
-                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/offers')
                       ? 'text-teal-700 font-extrabold bg-teal-50/70'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <ShoppingBag className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
+                  <ShoppingBag className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110 shrink-0" />
                   <span>Offers</span>
                   {isActive('/offers') ? (
                     <motion.div
@@ -249,13 +250,13 @@ const Navbar = () => {
               {isAuthenticated && (
                 <Link
                   to="/messages"
-                  className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  className={`relative group flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                     isActive('/messages')
                       ? 'text-teal-700 font-extrabold bg-teal-50/70'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
                   }`}
                 >
-                  <MessageSquare className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
+                  <MessageSquare className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110 shrink-0" />
                   <span>Messages</span>
                   {isActive('/messages') ? (
                     <motion.div
@@ -333,13 +334,13 @@ const Navbar = () => {
               </div>
             </nav>
 
-            {/* Right Action Buttons with smooth micro-interactions */}
-            <div className="flex items-center gap-2">
+            {/* Right Action Buttons with responsive tightening */}
+            <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
               {/* Ultra-Lite Mode Toggle */}
               <button
                 onClick={toggleUltraLite}
                 title={ultraLite ? 'Ultra-Lite Mode active' : 'Switch to Ultra-Lite Mode (low bandwidth)'}
-                className={`flex items-center gap-1 px-3 py-1 text-xs rounded-full border transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer ${
+                className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded-full border transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer shrink-0 ${
                   ultraLite
                     ? 'bg-teal-700 text-white border-teal-800 font-semibold shadow-xs'
                     : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200/80'
@@ -352,28 +353,28 @@ const Navbar = () => {
               {/* Demo Accounts Button */}
               <button
                 onClick={() => setDemoModalOpen(true)}
-                className="hidden sm:flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-bold transition-all duration-200 hover:-translate-y-0.5 active:scale-95 shadow-2xs cursor-pointer"
+                className="hidden sm:flex items-center gap-1 px-2.5 py-1 text-xs rounded-full bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-bold transition-all duration-200 hover:-translate-y-0.5 active:scale-95 shadow-2xs cursor-pointer shrink-0"
               >
                 Demo Logins
               </button>
 
               {isAuthenticated ? (
-                <div className="relative" ref={profileDropdownRef}>
+                <div className="relative shrink-0" ref={profileDropdownRef}>
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full bg-slate-100/90 hover:bg-slate-200/80 border border-slate-200 transition-all text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="flex items-center gap-1.5 p-1 pl-1.5 pr-2 rounded-full bg-slate-100/90 hover:bg-slate-200/80 border border-slate-200 transition-all text-xs text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500 shrink-0 cursor-pointer"
                   >
                     <img
-                      src={user.profile_photo_url || (user.email === 'nharivishnu31072008@gmail.com' ? '/images/avatars/harivishnu.jpg' : '/images/avatars/default.jpg')}
+                      src={resolveMediaUrl(user.profile_photo_url, (user.email === 'nharivishnu31072008@gmail.com' ? '/images/avatars/harivishnu.jpg' : '/images/avatars/default.jpg'))}
                       alt={user.full_name}
                       onError={(e) => { e.target.src = '/images/avatars/harivishnu.jpg'; }}
-                      className="w-7 h-7 rounded-full object-cover ring-1 ring-teal-600/30 bg-white"
+                      className="w-7 h-7 min-w-[28px] min-h-[28px] rounded-full object-cover shrink-0 ring-1 ring-teal-600/30 bg-white"
                     />
-                    <span className="hidden sm:inline font-bold text-xs max-w-[100px] truncate">{user.full_name?.split(' ')[0]}</span>
-                    <span className="hidden md:inline px-1.5 py-0.2 rounded-full bg-teal-100 text-teal-800 text-[10px] font-extrabold uppercase">
+                    <span className="hidden sm:inline font-bold text-xs max-w-[70px] xl:max-w-[100px] truncate">{user.full_name?.split(' ')[0]}</span>
+                    <span className="hidden md:inline px-1.5 py-0.2 rounded-full bg-teal-100 text-teal-800 text-[10px] font-extrabold uppercase shrink-0">
                       {user.role}
                     </span>
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform shrink-0 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   <AnimatePresence>

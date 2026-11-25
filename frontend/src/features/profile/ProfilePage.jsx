@@ -40,6 +40,7 @@ import { Card, Button, Badge } from '../../components/Button';
 import { getScalingStageBadge } from '../inventions/InventionCard';
 import AnimatedCounter from '../../components/AnimatedCounter';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
+import { compressImageToBase64, resolveMediaUrl, getInitials } from '../../utils/media';
 
 const PRESET_AVATARS = [
   { name: 'Hari Vishnu (You)', url: '/images/avatars/harivishnu.jpg' },
@@ -199,37 +200,33 @@ const ProfilePage = () => {
     if (!file) return;
 
     setUploadingPhoto(true);
-    const uploadData = new FormData();
-    uploadData.append('file', file);
 
     try {
-      const uploadRes = await apiClient.post('/upload', uploadData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      const uploadedUrl = uploadRes.data.url;
+      // Compress user portrait directly to Base64 JPEG Data URL (max 800px, 0.7 quality)
+      const base64Url = await compressImageToBase64(file, 800, 0.7);
 
       // Update in MySQL via user PATCH endpoint
-      const patchRes = await apiClient.patch('/users/me', {
-        profile_photo_url: uploadedUrl,
+      await apiClient.patch('/users/me', {
+        profile_photo_url: base64Url,
       });
 
       setDashboardData((prev) => ({
         ...prev,
         user: {
           ...prev.user,
-          profile_photo_url: uploadedUrl,
+          profile_photo_url: base64Url,
         },
       }));
 
-      // Update globally across navbar
+      // Update globally across navbar & components
       if (updateUser) {
-        updateUser({ profile_photo_url: uploadedUrl });
+        updateUser({ profile_photo_url: base64Url });
       }
 
-      setDetailsSuccess('Profile picture updated successfully!');
+      setDetailsSuccess('Profile picture updated successfully across the platform!');
       setTimeout(() => setDetailsSuccess(''), 4000);
     } catch (err) {
-      alert('Failed to upload photo. Please select a valid PNG or JPG file.');
+      alert('Failed to process photo. Please select a valid PNG or JPG file.');
     } finally {
       setUploadingPhoto(false);
     }
@@ -376,7 +373,7 @@ const ProfilePage = () => {
   const { user: profile, inventions = [], buyers = [], summary = {} } = dashboardData;
 
   // Active profile photo
-  const currentPhoto = profile.profile_photo_url || '/images/avatars/harivishnu.jpg';
+  const currentPhoto = resolveMediaUrl(profile.profile_photo_url, '/images/avatars/harivishnu.jpg');
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -1034,7 +1031,7 @@ const ProfilePage = () => {
                     <div className="relative h-44 w-full bg-slate-100 overflow-hidden border-b border-slate-100 flex items-center justify-center">
                       {inv.image_url ? (
                         <img
-                          src={inv.image_url}
+                          src={resolveMediaUrl(inv.image_url)}
                           alt={inv.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {

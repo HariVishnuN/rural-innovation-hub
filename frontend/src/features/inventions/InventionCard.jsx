@@ -25,6 +25,7 @@ import { useUltraLite } from '../../app/UltraLiteContext';
 import { useToast } from '../../components/Toast';
 import apiClient from '../../api/client';
 import CommercialOfferModal from '../offers/CommercialOfferModal';
+import { resolveMediaUrl, getInitials, KNOWN_AVATARS } from '../../utils/media';
 
 const DEFAULT_FALLBACK_IMG = "/images/inventions/solar-drip.svg";
 const DEFAULT_AVATAR = "/images/avatars/default.jpg";
@@ -104,8 +105,11 @@ const InventionCard = ({ invention, onUpdate }) => {
 
   const isMyInvention = Boolean(user && String(user.id) === String(invention.creator_id));
 
-  const imageSrc = !imgError && invention.image_url ? invention.image_url : DEFAULT_FALLBACK_IMG;
-  const avatarSrc = !avatarError && invention.creator_photo_url ? invention.creator_photo_url : DEFAULT_AVATAR;
+  const creatorLower = (creatorName || '').trim().toLowerCase();
+  const rawAvatar = invention.creator_photo_url || KNOWN_AVATARS[creatorLower] || (creatorLower.includes('ramesh') ? '/images/avatars/ramesh.jpg' : creatorLower.includes('kavita') ? '/images/avatars/kavita.jpg' : creatorLower.includes('suresh') ? '/images/avatars/suresh.jpg' : creatorLower.includes('hari') ? '/images/avatars/harivishnu.jpg' : null);
+  const resolvedAvatar = resolveMediaUrl(rawAvatar);
+
+  const imageSrc = !imgError && invention.image_url ? resolveMediaUrl(invention.image_url, DEFAULT_FALLBACK_IMG) : DEFAULT_FALLBACK_IMG;
 
   // Format creation date
   const formattedDate = invention.created_at
@@ -271,16 +275,23 @@ const InventionCard = ({ invention, onUpdate }) => {
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className="relative bg-white rounded-3xl border border-slate-200/90 shadow-soft hover:shadow-lifted hover:border-teal-300 transition-all duration-200 overflow-hidden flex flex-col group"
     >
-      {/* LinkedIn-Style Post Header */}
-      <div className="p-4 sm:p-5 pb-3 flex items-start justify-between gap-3 border-b border-slate-50">
+      {/* Restructured Discover Card Header: Two Clean Stacked Rows */}
+      <div className="p-4 sm:p-5 pb-3 border-b border-slate-100">
+        {/* Row 1: Profile Row */}
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <img
-              src={avatarSrc}
-              alt={creatorName}
-              onError={() => setAvatarError(true)}
-              className="w-12 h-12 rounded-full object-cover ring-2 ring-teal-500/20 border border-slate-200 bg-white"
-            />
+          <div className="relative shrink-0">
+            {resolvedAvatar && !avatarError ? (
+              <img
+                src={resolvedAvatar}
+                alt={creatorName}
+                onError={() => setAvatarError(true)}
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full object-cover shrink-0 ring-2 ring-teal-500/20 border border-slate-200 bg-white"
+              />
+            ) : (
+              <div className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-gradient-to-br from-teal-600 to-sky-700 text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0 select-none">
+                {getInitials(creatorName)}
+              </div>
+            )}
             {invention.creator_verified && (
               <span
                 className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-teal-600 text-white flex items-center justify-center text-[9px] font-bold ring-1 ring-white"
@@ -291,41 +302,28 @@ const InventionCard = ({ invention, onUpdate }) => {
             )}
           </div>
 
-          <div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-extrabold text-sm text-slate-900 hover:text-teal-700 transition-colors">
-                {creatorName}
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 font-semibold border border-teal-200/50">
-                Grassroots Innovator
-              </span>
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-gray-900 leading-tight truncate">
+              {creatorName}
             </div>
-
-            <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
-              <span className="flex items-center gap-0.5">
-                <MapPin className="w-3 h-3 text-slate-400" />
-                {creatorLocation}
-              </span>
-              <span>•</span>
-              <span>{formattedDate}</span>
+            <div className="text-[11px] text-slate-500 truncate mt-0.5">
+              {invention.creator_role || 'Grassroots Innovator'} • {creatorLocation || 'India'} • {formattedDate}
             </div>
           </div>
         </div>
 
-        {/* Category & Scaling Stage Badges */}
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {isMyInvention && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200 shadow-2xs whitespace-nowrap">
-                <CheckCircle2 className="w-3 h-3 text-teal-600" />
-                Your Invention
-              </span>
-            )}
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-600 text-white shadow-xs whitespace-nowrap">
-              {invention.category}
+        {/* Row 2: Badges Row */}
+        <div className="flex flex-wrap items-center gap-1.5 mt-3">
+          {isMyInvention && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200 shadow-2xs whitespace-nowrap">
+              <CheckCircle2 className="w-3 h-3 text-teal-600" />
+              Your Invention
             </span>
-            {getScalingStageBadge(invention.scaling_stage)}
-          </div>
+          )}
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-600 text-white shadow-xs whitespace-nowrap">
+            {invention.category}
+          </span>
+          {getScalingStageBadge(invention.scaling_stage)}
         </div>
       </div>
 
