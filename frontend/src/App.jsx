@@ -5,19 +5,22 @@ import { UltraLiteProvider } from './app/UltraLiteContext';
 import { OfflineProvider } from './app/OfflineContext';
 import { ToastProvider } from './components/Toast';
 import { AppRoutes } from './app/routes';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <UltraLiteProvider>
-          <OfflineProvider>
-            <ToastProvider>
-              <AppRoutes />
-            </ToastProvider>
-          </OfflineProvider>
-        </UltraLiteProvider>
-      </AuthProvider>
+      <ErrorBoundary>
+        <AuthProvider>
+          <UltraLiteProvider>
+            <OfflineProvider>
+              <ToastProvider>
+                <AppRoutes />
+              </ToastProvider>
+            </OfflineProvider>
+          </UltraLiteProvider>
+        </AuthProvider>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

@@ -33,6 +33,8 @@ import {
   Check,
   Trash2,
   Loader2,
+  Lightbulb,
+  RotateCcw,
 } from 'lucide-react';
 import { useAuth } from '../../app/AuthContext';
 import apiClient from '../../api/client';
@@ -40,6 +42,7 @@ import { Card, Button, Badge } from '../../components/Button';
 import { getScalingStageBadge } from '../inventions/InventionCard';
 import AnimatedCounter from '../../components/AnimatedCounter';
 import LoadingSkeleton from '../../components/LoadingSkeleton';
+import ErrorBoundary from '../../components/ErrorBoundary';
 import { compressImageToBase64, resolveMediaUrl, getInitials } from '../../utils/media';
 
 const PRESET_AVATARS = [
@@ -78,17 +81,19 @@ const LANGUAGES = [
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryTab = searchParams.get('tab');
+  const rawQueryTab = searchParams ? searchParams.get('tab') : null;
+  const queryTab = typeof rawQueryTab === 'string' ? rawQueryTab.toLowerCase().trim() : '';
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Active Tab state synced with URL ?tab=...
-  const [activeTab, setActiveTab] = useState(
-    queryTab === 'buyers' || queryTab === 'offers' ? 'offers' :
-    queryTab === 'details' ? 'details' :
-    queryTab === 'settings' ? 'settings' : 'details'
-  );
+  const [activeTab, setActiveTab] = useState(() => {
+    if (queryTab === 'inventions') return 'inventions';
+    if (queryTab === 'buyers' || queryTab === 'offers') return 'offers';
+    if (queryTab === 'settings') return 'settings';
+    return 'details';
+  });
 
   useEffect(() => {
     if (queryTab) {
@@ -172,23 +177,40 @@ const ProfilePage = () => {
     setLoading(true);
     try {
       const res = await apiClient.get('/users/me/dashboard');
-      setDashboardData(res.data);
-      const u = res.data.user;
-      setFormData({
-        full_name: u.full_name || '',
-        phone: u.phone || '',
-        preferred_language: u.preferred_language || 'English',
-        village_city: u.village_city || '',
-        district: u.district || '',
-        state: u.state || '',
-        pincode: u.pincode || '',
-        organization_college: u.organization_college || '',
-        bio: u.bio || '',
-        skills_expertise: u.skills_expertise || '',
-      });
-      setPinUsername(u.username || '');
+      if (res?.data) {
+        setDashboardData(res.data);
+        const u = res.data.user || user || {};
+        setFormData({
+          full_name: u.full_name || '',
+          phone: u.phone || '',
+          preferred_language: u.preferred_language || 'English',
+          village_city: u.village_city || '',
+          district: u.district || '',
+          state: u.state || '',
+          pincode: u.pincode || '',
+          organization_college: u.organization_college || '',
+          bio: u.bio || '',
+          skills_expertise: u.skills_expertise || '',
+        });
+        setPinUsername(u.username || '');
+      }
     } catch (e) {
-      console.warn('Failed to load innovator dashboard', e);
+      console.warn('Failed to load innovator dashboard, falling back to local user session:', e);
+      if (user) {
+        setFormData({
+          full_name: user.full_name || '',
+          phone: user.phone || '',
+          preferred_language: user.preferred_language || 'English',
+          village_city: user.village_city || '',
+          district: user.district || '',
+          state: user.state || '',
+          pincode: user.pincode || '',
+          organization_college: user.organization_college || '',
+          bio: user.bio || '',
+          skills_expertise: user.skills_expertise || '',
+        });
+        setPinUsername(user.username || '');
+      }
     } finally {
       setLoading(false);
     }
@@ -362,18 +384,39 @@ const ProfilePage = () => {
     }
   };
 
-  if (loading || !dashboardData) {
+  if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
-        <LoadingSkeleton count={4} type="stats" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex flex-col items-center justify-center min-h-[450px] space-y-4 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shadow-soft">
+          <Loader2 className="w-7 h-7 text-teal-600 animate-spin" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-base font-bold text-slate-800">Loading Your Innovator Profile</h2>
+          <p className="text-xs text-slate-500 max-w-sm">
+            Fetching your verified inventions, blueprints, and buyer offers...
+          </p>
+        </div>
       </div>
     );
   }
 
-  const { user: profile, inventions = [], buyers = [], summary = {} } = dashboardData;
+  // Derive profile data with full null-safety and fallbacks
+  const profile = dashboardData?.user || user || {};
+  const inventions = Array.isArray(dashboardData?.inventions) ? dashboardData.inventions : [];
+  const buyers = Array.isArray(dashboardData?.buyers) ? dashboardData.buyers : [];
+  const summary = dashboardData?.summary || {
+    total_inventions: inventions.length,
+    total_likes: 0,
+    total_comments: 0,
+    total_paid_reuses: 0,
+    total_earnings_inr: 0,
+  };
 
   // Active profile photo
-  const currentPhoto = resolveMediaUrl(profile.profile_photo_url, '/images/avatars/harivishnu.jpg');
+  const currentPhoto = resolveMediaUrl(
+    profile?.profile_photo_url,
+    profile?.email === 'nharivishnu31072008@gmail.com' ? '/images/avatars/harivishnu.jpg' : '/images/avatars/default.jpg'
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -392,7 +435,7 @@ const ProfilePage = () => {
               <div className="w-20 h-20 rounded-2xl ring-4 ring-teal-500/30 overflow-hidden shadow-md bg-slate-100 flex items-center justify-center">
                 <img
                   src={currentPhoto}
-                  alt={profile.full_name}
+                  alt={profile?.full_name || 'User'}
                   onError={(e) => { e.target.src = '/images/avatars/harivishnu.jpg'; }}
                   className="w-full h-full object-cover"
                 />
@@ -427,32 +470,32 @@ const ProfilePage = () => {
             {/* Name, Roles, Language & Badges */}
             <div className="space-y-1">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight">{profile.full_name}</h1>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight">{profile?.full_name || 'Grassroots Innovator'}</h1>
                 <span className="px-3 py-0.5 rounded-full text-xs font-extrabold bg-teal-50 text-teal-800 border border-teal-200/60 shadow-2xs">
-                  {profile.role}
+                  {profile?.role || 'INNOVATOR'}
                 </span>
-                {profile.username && (
+                {profile?.username && (
                   <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-mono text-xs font-bold border border-slate-200">
                     @{profile.username}
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200">
                   <Globe className="w-3 h-3 text-teal-600" />
-                  <span>{profile.preferred_language || 'English'}</span>
+                  <span>{profile?.preferred_language || 'English'}</span>
                 </span>
               </div>
 
               <p className="text-xs text-slate-500 flex items-center gap-2 flex-wrap pt-0.5">
                 <span className="flex items-center gap-1 text-slate-700 font-medium">
                   <MapPin className="w-3.5 h-3.5 text-teal-600" />
-                  {profile.village_city || 'Rural Region'}, {profile.state || 'India'}
+                  {profile?.village_city || 'Rural Region'}, {profile?.state || 'India'}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1 font-mono text-slate-600">
                   <Mail className="w-3.5 h-3.5 text-slate-400" />
-                  {profile.email}
+                  {profile?.email || 'user@example.com'}
                 </span>
-                {profile.phone && (
+                {profile?.phone && (
                   <>
                     <span>•</span>
                     <span className="flex items-center gap-1 text-slate-600">
@@ -1158,41 +1201,42 @@ const ProfilePage = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {buyers.map((offer) => {
-                const isPending = offer.status.toUpperCase() === 'PENDING';
-                const isAccepted = offer.status.toUpperCase() === 'ACCEPTED';
-                const isPaid = offer.status.toUpperCase() === 'PAID';
+              {(buyers || []).map((offer) => {
+                const statusStr = (offer?.status || '').toUpperCase();
+                const isPending = statusStr === 'PENDING';
+                const isAccepted = statusStr === 'ACCEPTED';
+                const isPaid = statusStr === 'PAID';
 
                 return (
                   <div
-                    key={offer.id}
+                    key={offer?.id || Math.random()}
                     className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 p-5 shadow-soft hover:shadow-md transition-shadow space-y-4"
                   >
                     {/* Header Row */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                       <div className="flex items-center gap-2.5">
                         <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-800 font-bold flex items-center justify-center text-sm">
-                          {offer.buyer_name?.charAt(0) || 'O'}
+                          {offer?.buyer_name?.charAt(0) || 'O'}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-sm text-slate-900">{offer.buyer_name}</span>
+                            <span className="font-bold text-sm text-slate-900">{offer?.buyer_name || 'Buyer'}</span>
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold">
-                              {offer.organization_name}
+                              {offer?.organization_name || 'Organization'}
                             </span>
                           </div>
                           <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
-                            <span>{offer.buyer_email}</span>
-                            {offer.buyer_phone && <span>• {offer.buyer_phone}</span>}
+                            <span>{offer?.buyer_email || 'No email provided'}</span>
+                            {offer?.buyer_phone && <span>• {offer.buyer_phone}</span>}
                             <span>•</span>
-                            <span>{new Date(offer.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            <span>{offer?.created_at ? new Date(offer.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}</span>
                           </div>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
                         <span className="px-2.5 py-1 rounded-full text-xs font-extrabold bg-teal-50 text-teal-800 border border-teal-200">
-                          {offer.offer_type}
+                          {offer?.offer_type || 'Commercial Inquiry'}
                         </span>
 
                         {isPaid && (
@@ -1338,4 +1382,10 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+const ProfilePageWithErrorBoundary = (props) => (
+  <ErrorBoundary title="Failed to load Innovator Profile">
+    <ProfilePage {...props} />
+  </ErrorBoundary>
+);
+
+export default ProfilePageWithErrorBoundary;
