@@ -52,6 +52,22 @@ const InvestorsDirectoryPage = () => {
 
   useEffect(() => {
     fetchInvestors();
+
+    // Auto-refresh when tab gains focus or on interval for live investor directory
+    const handleFocus = () => fetchInvestors(false);
+    const handleNewUser = () => fetchInvestors(false);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('rih_new_user_registered', handleNewUser);
+
+    const interval = setInterval(() => {
+      fetchInvestors(false);
+    }, 20000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('rih_new_user_registered', handleNewUser);
+      clearInterval(interval);
+    };
   }, [selectedSector]);
 
   useEffect(() => {
@@ -60,8 +76,8 @@ const InvestorsDirectoryPage = () => {
     }
   }, [activeTab, isAuthenticated]);
 
-  const fetchInvestors = async () => {
-    setLoadingInvestors(true);
+  const fetchInvestors = async (showLoader = true) => {
+    if (showLoader) setLoadingInvestors(true);
     try {
       const params = {};
       if (keyword.trim()) params.keyword = keyword.trim();
@@ -77,7 +93,7 @@ const InvestorsDirectoryPage = () => {
     } catch (e) {
       console.error('Failed to load investors', e);
     } finally {
-      setLoadingInvestors(false);
+      if (showLoader) setLoadingInvestors(false);
     }
   };
 

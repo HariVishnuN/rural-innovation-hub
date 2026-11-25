@@ -107,10 +107,10 @@ class InventionService:
             description=clean_desc,
             assembly_steps=serialized_steps,
             total_cost=total_cost,
-            image_url=req.image_url or "/images/inventions/solar-drip.svg",
-            video_url=req.video_url,
-            blueprint_url=req.blueprint_url or "/images/blueprints/solar-drip-blueprint.svg",
-            sketch_url=req.sketch_url or "/images/blueprints/solar-drip-blueprint.svg",
+            image_url=(req.image_url.strip() if req.image_url else None),
+            video_url=(req.video_url.strip() if req.video_url else None),
+            blueprint_url=(req.blueprint_url.strip() if req.blueprint_url else None),
+            sketch_url=(req.sketch_url.strip() if req.sketch_url else None),
             sha256_hash=sha256_hash,
             submission_timestamp=now,
             moderation_status="APPROVED",
@@ -223,31 +223,102 @@ class InventionService:
                 if len(deduped_inventions) >= limit:
                     break
 
-        results = []
-        for inv in deduped_inventions:
-            # Aggregates
-            avg_rating = db.query(func.avg(ReviewRating.rating)).filter(ReviewRating.invention_id == inv.id).scalar() or 0.0
-            rev_count = db.query(func.count(ReviewRating.id)).filter(ReviewRating.invention_id == inv.id).scalar() or 0
-            rep_count = db.query(func.count(Replication.id)).filter(Replication.invention_id == inv.id).scalar() or 0
-            pledged = db.query(func.sum(FundingPledge.amount)).filter(FundingPledge.invention_id == inv.id, FundingPledge.status != "CANCELLED").scalar() or Decimal("0.00")
-            likes_cnt = db.query(func.count(InventionLike.id)).filter(InventionLike.invention_id == inv.id).scalar() or 0
-            comments_cnt = db.query(func.count(InventionComment.id)).filter(InventionComment.invention_id == inv.id).scalar() or 0
-            paid_reuses_cnt = db.query(func.count(CommercialOffer.id)).filter(
-                CommercialOffer.invention_id == inv.id,
+        if not deduped_inventions:
+            return []
+
+        inv_ids = [inv.id for inv in deduped_inventions]
+        creator_ids = list(set(inv.creator_id for inv in deduped_inventions))
+
+        # Batch load users
+        users_by_id = {u.id: u for u in db.query(User).filter(User.id.in_(creator_ids)).all()}
+
+        # Batch load ratings (avg and count)
+        ratings_rows = (
+            db.query(
+                ReviewRating.invention_id,
+                func.avg(ReviewRating.rating).label("avg_rating"),
+                func.count(ReviewRating.id).label("rev_count"),
+            )
+            .filter(ReviewRating.invention_id.in_(inv_ids))
+            .group_by(ReviewRating.invention_id)
+            .all()
+        )
+        ratings_map = {r[0]: (float(r[1] or 0.0), int(r[2] or 0)) for r in ratings_rows}
+
+        # Batch load replications
+        rep_rows = (
+            db.query(Replication.invention_id, func.count(Replication.id))
+            .filter(Replication.invention_id.in_(inv_ids))
+            .group_by(Replication.invention_id)
+            .all()
+        )
+        rep_map = {r[0]: int(r[1] or 0) for r in rep_rows}
+
+        # Batch load pledges
+        pledge_rows = (
+            db.query(FundingPledge.invention_id, func.sum(FundingPledge.amount))
+            .filter(FundingPledge.invention_id.in_(inv_ids), FundingPledge.status != "CANCELLED")
+            .group_by(FundingPledge.invention_id)
+            .all()
+        )
+        pledge_map = {r[0]: (r[1] or Decimal("0.00")) for r in pledge_rows}
+
+        # Batch load likes count
+        like_rows = (
+            db.query(InventionLike.invention_id, func.count(InventionLike.id))
+            .filter(InventionLike.invention_id.in_(inv_ids))
+            .group_by(InventionLike.invention_id)
+            .all()
+        )
+        likes_map = {r[0]: int(r[1] or 0) for r in like_rows}
+
+        # Batch load comments count
+        comment_rows = (
+            db.query(InventionComment.invention_id, func.count(InventionComment.id))
+            .filter(InventionComment.invention_id.in_(inv_ids))
+            .group_by(InventionComment.invention_id)
+            .all()
+        )
+        comments_map = {r[0]: int(r[1] or 0) for r in comment_rows}
+
+        # Batch load paid reuses / offers
+        paid_rows = (
+            db.query(CommercialOffer.invention_id, func.count(CommercialOffer.id))
+            .filter(
+                CommercialOffer.invention_id.in_(inv_ids),
                 or_(
                     CommercialOffer.status.in_(["ACCEPTED", "PAID", "Accepted", "Paid"]),
-                    CommercialOffer.offer_type.in_(["PAID_REUSE", "Paid Reuse", "BUY", "RENT", "Buy", "Rent"])
+                    CommercialOffer.offer_type.in_(["PAID_REUSE", "Paid Reuse", "BUY", "RENT", "Buy", "Rent"]),
+                ),
+            )
+            .group_by(CommercialOffer.invention_id)
+            .all()
+        )
+        paid_map = {r[0]: int(r[1] or 0) for r in paid_rows}
+
+        # Batch check if liked by current user
+        liked_ids = set()
+        if current_user_id:
+            liked_ids = set(
+                row[0]
+                for row in db.query(InventionLike.invention_id)
+                .filter(
+                    InventionLike.invention_id.in_(inv_ids),
+                    InventionLike.user_id == current_user_id,
                 )
-            ).scalar() or 0
+                .all()
+            )
 
-            is_liked = False
-            if current_user_id:
-                is_liked = db.query(InventionLike.id).filter(
-                    InventionLike.invention_id == inv.id,
-                    InventionLike.user_id == current_user_id
-                ).first() is not None
-
-            creator = db.query(User).filter(User.id == inv.creator_id).first()
+        results = []
+        for inv in deduped_inventions:
+            creator = users_by_id.get(inv.creator_id)
+            avg_rating, rev_count = ratings_map.get(inv.id, (0.0, 0))
+            rep_count = rep_map.get(inv.id, 0)
+            pledged = pledge_map.get(inv.id, Decimal("0.00"))
+            likes_cnt = likes_map.get(inv.id, 0)
+            comments_cnt = comments_map.get(inv.id, 0)
+            paid_reuses_cnt = paid_map.get(inv.id, 0)
+            is_liked = inv.id in liked_ids
 
             results.append(
                 InventionResponse(

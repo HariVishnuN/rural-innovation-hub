@@ -20,6 +20,7 @@ from app.models.pitch import Pitch
 from app.models.social import InventionLike, InventionComment
 from app.models.otp import EmailOTP
 from app.models.shortlist import OfficialShortlist
+from app.models.patent import PatentApplication
 
 __all__ = [
     "User",
@@ -45,4 +46,5 @@ __all__ = [
     "InventionComment",
     "EmailOTP",
     "OfficialShortlist",
+    "PatentApplication",
 ]

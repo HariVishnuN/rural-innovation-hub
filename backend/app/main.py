@@ -27,6 +27,7 @@ from app.routers import (
     investors_router,
     pitches_router,
     officials_router,
+    patents_router,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -151,6 +152,7 @@ app.include_router(upload_router, prefix="/api")
 app.include_router(investors_router, prefix="/api")
 app.include_router(pitches_router, prefix="/api")
 app.include_router(officials_router, prefix="/api")
+app.include_router(patents_router, prefix="/api")
 app.include_router(health_router, prefix="/api")
 app.include_router(websocket_router, prefix="/api")
 

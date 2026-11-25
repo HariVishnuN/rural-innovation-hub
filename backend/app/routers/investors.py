@@ -37,8 +37,14 @@ def list_investors(
     """Returns list of registered Impact Investors, Agritech Venture Scouts, and CSR/NGO Representatives."""
     query = db.query(User).filter(
         User.is_deleted == False,
-        or_(User.role == "INVESTOR", User.role == "ADMIN"),
-    )
+        or_(
+            User.role == "INVESTOR",
+            User.role == "OFFICIAL",
+            User.role == "ADMIN",
+            User.role == "CSR",
+            User.role == "GOVERNMENT",
+        ),
+    ).order_by(User.created_at.desc())
 
     if state and state != "All":
         query = query.filter(User.state.ilike(f"%{state.strip()}%"))

@@ -29,16 +29,24 @@ const InventionCreate = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState(() => {
-    if (savedDraft) return savedDraft;
+    if (savedDraft) {
+      return {
+        ...savedDraft,
+        image_url: savedDraft.image_url === '/images/inventions/solar-drip.svg' ? '' : (savedDraft.image_url || ''),
+        blueprint_url: savedDraft.blueprint_url === '/images/blueprints/solar-drip-blueprint.svg' ? '' : (savedDraft.blueprint_url || ''),
+        sketch_url: savedDraft.sketch_url === '/images/blueprints/solar-drip-blueprint.svg' ? '' : (savedDraft.sketch_url || ''),
+        video_url: savedDraft.video_url || '',
+      };
+    }
     return {
       title: '',
       category: 'Agriculture',
       region: user?.state || 'Gujarat',
       description: '',
       durability_notes: '',
-      image_url: '/images/inventions/solar-drip.svg',
-      blueprint_url: '/images/blueprints/solar-drip-blueprint.svg',
-      sketch_url: '/images/blueprints/solar-drip-blueprint.svg',
+      image_url: '',
+      blueprint_url: '',
+      sketch_url: '',
       video_url: '',
       scaling_stage: 'RAW_PROTOTYPE',
       estimated_co2_savings_kg: 100,
@@ -279,9 +287,10 @@ const InventionCreate = () => {
       assembly_steps: finalSteps,
       estimated_co2_savings_kg: parseFloat(formData.estimated_co2_savings_kg) || 120,
       estimated_water_savings_liters: parseFloat(formData.estimated_water_savings_liters) || 5000,
-      image_url: formData.image_url || '/images/inventions/solar-drip.svg',
-      blueprint_url: formData.blueprint_url || '/images/blueprints/solar-drip-blueprint.svg',
-      sketch_url: formData.sketch_url || '/images/blueprints/solar-drip-blueprint.svg',
+      image_url: formData.image_url ? formData.image_url.trim() : null,
+      blueprint_url: formData.blueprint_url ? formData.blueprint_url.trim() : null,
+      sketch_url: formData.sketch_url ? formData.sketch_url.trim() : null,
+      video_url: formData.video_url ? formData.video_url.trim() : null,
     };
 
     setSubmitting(true);
@@ -429,6 +438,16 @@ const InventionCreate = () => {
                     placeholder="/images/inventions/... or URL"
                     className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-200 font-mono"
                   />
+                  {formData.image_url && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, image_url: '' }))}
+                      className="px-2 py-1 text-[11px] font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                      title="Clear uploaded photo"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
 
                 {formData.image_url ? (
@@ -484,6 +503,16 @@ const InventionCreate = () => {
                     placeholder="/images/blueprints/... or URL"
                     className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-200 font-mono"
                   />
+                  {formData.blueprint_url && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, blueprint_url: '' }))}
+                      className="px-2 py-1 text-[11px] font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                      title="Clear uploaded blueprint"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
 
                 {formData.blueprint_url ? (
@@ -539,6 +568,16 @@ const InventionCreate = () => {
                     placeholder="Sketch URL or local path"
                     className="flex-1 px-2.5 py-1 text-xs rounded-lg border border-slate-200 font-mono"
                   />
+                  {formData.sketch_url && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, sketch_url: '' }))}
+                      className="px-2 py-1 text-[11px] font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                      title="Clear uploaded sketch"
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
 
                 {formData.sketch_url ? (

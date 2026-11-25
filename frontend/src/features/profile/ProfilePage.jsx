@@ -1031,12 +1031,22 @@ const ProfilePage = () => {
                 >
                   <div>
                     {/* Image Header */}
-                    <div className="relative h-44 w-full bg-slate-100 overflow-hidden border-b border-slate-100">
-                      <img
-                        src={inv.image_url || '/images/inventions/solar-drip.svg'}
-                        alt={inv.title}
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="relative h-44 w-full bg-slate-100 overflow-hidden border-b border-slate-100 flex items-center justify-center">
+                      {inv.image_url ? (
+                        <img
+                          src={inv.image_url}
+                          alt={inv.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`${inv.image_url ? 'hidden' : 'flex'} w-full h-full items-center justify-center bg-slate-100 text-slate-400 text-xs font-bold gap-1.5`}>
+                        <Lightbulb className="w-6 h-6 text-slate-300" />
+                        <span>Open Hardware Schematic</span>
+                      </div>
                       <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-600 text-white shadow-xs">
                           {inv.category}

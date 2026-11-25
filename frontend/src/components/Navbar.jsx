@@ -94,12 +94,12 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo with micro hover lift */}
-            <Link to="/" className="flex items-center gap-2.5 group transition-transform hover:-translate-y-0.5">
-              <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-soft group-hover:shadow-teal-500/25 group-hover:bg-teal-700 transition-all">
+            <Link to="/" className="flex items-center gap-2.5 group transition-transform hover:-translate-y-0.5 shrink-0 whitespace-nowrap">
+              <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-soft group-hover:shadow-teal-500/25 group-hover:bg-teal-700 transition-all shrink-0">
                 <Lightbulb className="w-5 h-5 text-amber-300 transition-transform group-hover:rotate-12" />
               </div>
-              <div>
-                <span className="font-black text-lg text-slate-900 tracking-tight flex items-center gap-1.5">
+              <div className="shrink-0">
+                <span className="font-black text-lg text-slate-900 tracking-tight flex items-center gap-1.5 leading-tight">
                   Rural Innovation Hub
                 </span>
                 <span className="hidden sm:block text-[10px] text-teal-700 font-bold uppercase tracking-wider">
@@ -144,6 +144,28 @@ const Navbar = () => {
                 <Users className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
                 <span>Investors & Pitch</span>
                 {isActive('/investors') ? (
+                  <motion.div
+                    layoutId="navbar-active-indicator"
+                    className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-teal-600 rounded-full"
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                ) : (
+                  <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-teal-600/70 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+                )}
+              </Link>
+
+              {/* Patent & IP Services */}
+              <Link
+                to="/patents"
+                className={`relative group flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+                  isActive('/patents')
+                    ? 'text-teal-700 font-extrabold bg-teal-50/70'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50/80'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-teal-600 transition-transform group-hover:scale-110" />
+                <span>Patent & IP Services</span>
+                {isActive('/patents') ? (
                   <motion.div
                     layoutId="navbar-active-indicator"
                     className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-teal-600 rounded-full"
@@ -490,6 +512,14 @@ const Navbar = () => {
             >
               <Users className="w-4 h-4 text-teal-600" />
               Investors & Pitch
+            </Link>
+            <Link
+              to="/patents"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-100"
+            >
+              <ShieldCheck className="w-4 h-4 text-teal-600" />
+              Patent & IP Services
             </Link>
             <Link
               to="/inventions/new"

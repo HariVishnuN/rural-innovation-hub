@@ -43,6 +43,9 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('rih_auth_token', access_token);
     localStorage.setItem('rih_auth_user', JSON.stringify(userData));
+    try {
+      window.dispatchEvent(new CustomEvent('rih_new_user_registered', { detail: userData }));
+    } catch {}
     return userData;
   };
 
@@ -56,6 +59,9 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('rih_auth_token', access_token);
     localStorage.setItem('rih_auth_user', JSON.stringify(userData));
+    try {
+      window.dispatchEvent(new CustomEvent('rih_new_user_registered', { detail: userData }));
+    } catch {}
     return userData;
   };
 
@@ -80,6 +86,9 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('rih_auth_token', access_token);
     localStorage.setItem('rih_auth_user', JSON.stringify(userData));
+    try {
+      window.dispatchEvent(new CustomEvent('rih_new_user_registered', { detail: userData }));
+    } catch {}
     return userData;
   };
 
@@ -105,6 +114,9 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('rih_auth_token', access_token);
     localStorage.setItem('rih_auth_user', JSON.stringify(userData));
+    try {
+      window.dispatchEvent(new CustomEvent('rih_new_user_registered', { detail: userData }));
+    } catch {}
     return userData;
   };
 
@@ -123,9 +135,29 @@ export const AuthProvider = ({ children }) => {
     setUser((prev) => {
       const merged = { ...prev, ...updatedUserData };
       localStorage.setItem('rih_auth_user', JSON.stringify(merged));
+      try {
+        window.dispatchEvent(new CustomEvent('rih_profile_updated', { detail: merged }));
+      } catch (err) {
+        console.warn('Profile event dispatch notice:', err);
+      }
       return merged;
     });
   };
+
+  // Keep state synchronized across browser tabs
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'rih_auth_user' && e.newValue) {
+        try {
+          setUser(JSON.parse(e.newValue));
+        } catch {}
+      } else if (e.key === 'rih_auth_token' && !e.newValue) {
+        logout();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <AuthContext.Provider

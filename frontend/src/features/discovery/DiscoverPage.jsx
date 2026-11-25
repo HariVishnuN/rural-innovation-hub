@@ -5,8 +5,6 @@ import {
   Search,
   Filter,
   SlidersHorizontal,
-  LayoutList,
-  LayoutGrid,
   PlusCircle,
   Sparkles,
   TrendingUp,
@@ -30,7 +28,6 @@ const DiscoverPage = () => {
   const { showToast } = useToast();
   const [inventions, setInventions] = useState(DEFAULT_INVENTIONS);
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState('feed'); // 'feed' | 'grid'
 
   // Filters
   const [keyword, setKeyword] = useState('');
@@ -205,15 +202,15 @@ const DiscoverPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Parallax Header with Title, Floating Chips, and Create Invention CTA */}
+      {/* Parallax Header with Title, Badges, and Create Invention CTA */}
       <motion.div
         style={ultraLite ? undefined : { y: headerDriftY }}
         className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-2"
       >
-        <div className="relative">
-          <div className="flex items-center gap-2">
+        <div>
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Public Innovation Feed
+              Public Innovation Showcase
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200 inline-flex items-center gap-1 shadow-2xs">
               <Sparkles className="w-3 h-3 text-teal-600" />
@@ -224,71 +221,31 @@ const DiscoverPage = () => {
             Browse, like, comment, and pay to reuse grassroots machines built by village makers and agricultural innovators.
           </p>
 
-          {/* Floating Subtle Parallax Accent Icons */}
-          {!ultraLite && (
-            <>
-              <motion.div
-                style={{ y: tagFloatY1 }}
-                className="hidden lg:flex absolute -right-24 -top-3 items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs border border-teal-200/80 text-[11px] font-bold text-teal-700 shadow-sm pointer-events-none"
-              >
-                <Cpu className="w-3.5 h-3.5 text-teal-600" />
-                <span>Open Hardware</span>
-              </motion.div>
-              <motion.div
-                style={{ y: tagFloatY2 }}
-                className="hidden lg:flex absolute -right-48 top-8 items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-xs border border-sky-200/80 text-[11px] font-bold text-sky-700 shadow-sm pointer-events-none"
-              >
-                <Compass className="w-3.5 h-3.5 text-sky-600" />
-                <span>Verified Field Tests</span>
-              </motion.div>
-            </>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Animated View Mode Toggle */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-2xs">
-            <motion.button
-              whileTap={{ scale: 0.98 }}
-              whileHover={{ y: -1 }}
-              onClick={() => setViewMode('feed')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'feed'
-                  ? 'bg-white text-teal-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <LayoutList className="w-3.5 h-3.5" />
-              <span>Feed View</span>
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.98 }}
-              whileHover={{ y: -1 }}
-              onClick={() => setViewMode('grid')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-white text-teal-700 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Grid View</span>
-            </motion.button>
+          {/* Clean Inline Badges */}
+          <div className="flex items-center gap-2 flex-wrap mt-2.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[11px] font-bold text-teal-700 shadow-2xs">
+              <Cpu className="w-3.5 h-3.5 text-teal-600" />
+              <span>Open Hardware</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-[11px] font-bold text-sky-700 shadow-2xs">
+              <Compass className="w-3.5 h-3.5 text-sky-600" />
+              <span>Verified Field Tests</span>
+            </span>
           </div>
-
-          {/* Tactile Press & Elevation on Showcase Invention Button */}
-          <Link to="/inventions/new">
-            <motion.div
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-teal-500/25 transition-all cursor-pointer"
-            >
-              <PlusCircle className="w-4 h-4 text-amber-300" />
-              <span>+ Showcase New Invention Now</span>
-            </motion.div>
-          </Link>
         </div>
+
+        {/* Tactile Press & Elevation on Showcase Invention Button */}
+        <Link to="/inventions/new" className="shrink-0">
+          <motion.div
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-teal-500/25 transition-all cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4 text-amber-300" />
+            <span>+ Showcase New Invention Now</span>
+          </motion.div>
+        </Link>
       </motion.div>
 
       {/* Search & Filter Bar with Animated Hover Elevate */}
@@ -392,9 +349,9 @@ const DiscoverPage = () => {
         </div>
       </motion.div>
 
-      {/* Main Feed Content with Staggered Cascading Reveal */}
+      {/* Main Grid Content with Staggered Cascading Reveal */}
       {loading ? (
-        <LoadingSkeleton count={viewMode === 'feed' ? 3 : 6} type={viewMode === 'feed' ? 'feed' : 'card'} />
+        <LoadingSkeleton count={6} type="card" />
       ) : inventions.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
@@ -418,23 +375,8 @@ const DiscoverPage = () => {
             <span>Reset Filters & Show All Reference Innovations</span>
           </button>
         </motion.div>
-      ) : viewMode === 'feed' ? (
-        /* LinkedIn Single-Column Feed with Staggered Animations */
-        <motion.div
-          key="feed-container"
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="max-w-2xl mx-auto space-y-6"
-        >
-          {inventions.map((inv) => (
-            <motion.div key={inv.id} variants={itemVariants}>
-              <InventionCard invention={inv} onUpdate={fetchInventions} />
-            </motion.div>
-          ))}
-        </motion.div>
       ) : (
-        /* Grid View with Staggered Animations */
+        /* Permanent 3-Column Responsive Grid View */
         <motion.div
           key="grid-container"
           variants={containerVariants}

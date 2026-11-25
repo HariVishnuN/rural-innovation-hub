@@ -19,6 +19,7 @@ import IPResourcesPage from '../features/ip-resources/IPResourcesPage';
 import CommercialOffersPage from '../features/offers/CommercialOffersPage';
 import InvestorsDirectoryPage from '../features/investors/InvestorsDirectoryPage';
 import OfficialsPortalPage from '../features/officials/OfficialsPortalPage';
+import PatentServicesPage from '../features/patents/PatentServicesPage';
 import { useAuth } from './AuthContext';
 
 // Protected Route Guard
@@ -45,6 +46,7 @@ export const AppRoutes = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/investors" element={<InvestorsDirectoryPage />} />
+        <Route path="/patents" element={<PatentServicesPage />} />
         <Route path="/inventions/:id" element={<InventionDetail />} />
         <Route path="/bounties" element={<BountiesPage />} />
         <Route path="/workshops" element={<WorkshopsPage />} />

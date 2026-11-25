@@ -126,21 +126,48 @@ const InventionCard = ({ invention, onUpdate }) => {
     const previousLiked = isLiked;
     const previousCount = likesCount;
     const nextLiked = !previousLiked;
+    const nextCount = previousLiked ? Math.max(0, previousCount - 1) : previousCount + 1;
     setIsLiked(nextLiked);
-    setLikesCount(previousLiked ? Math.max(0, previousCount - 1) : previousCount + 1);
+    setLikesCount(nextCount);
 
     if (nextLiked) {
       showToast('❤️ Added to your appreciated innovations', 'like');
     }
 
+    // Broadcast like event to other open cards/windows
+    window.dispatchEvent(
+      new CustomEvent('rih_invention_liked', {
+        detail: { inventionId: invention.id, liked: nextLiked, likesCount: nextCount, byUserId: user?.id },
+      })
+    );
+
     try {
       const res = await apiClient.post(`/inventions/${invention.id}/like`);
       setIsLiked(res.data.liked);
       setLikesCount(res.data.likes_count);
+      window.dispatchEvent(
+        new CustomEvent('rih_invention_liked', {
+          detail: { inventionId: invention.id, liked: res.data.liked, likesCount: res.data.likes_count, byUserId: user?.id },
+        })
+      );
     } catch (e) {
       console.warn('Backend like sync notice; keeping optimistic state');
     }
   };
+
+  // Sync likes across card instances in real time
+  React.useEffect(() => {
+    const handleLikeSync = (e) => {
+      if (e.detail?.inventionId === invention.id) {
+        setLikesCount(e.detail.likesCount);
+        if (e.detail.byUserId === user?.id) {
+          setIsLiked(e.detail.liked);
+        }
+      }
+    };
+    window.addEventListener('rih_invention_liked', handleLikeSync);
+    return () => window.removeEventListener('rih_invention_liked', handleLikeSync);
+  }, [invention.id, user?.id]);
 
   // Toggle Comments Drawer
   const toggleComments = async () => {
@@ -286,17 +313,19 @@ const InventionCard = ({ invention, onUpdate }) => {
         </div>
 
         {/* Category & Scaling Stage Badges */}
-        <div className="flex flex-col items-end gap-1">
-          {isMyInvention && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200 shadow-2xs">
-              <CheckCircle2 className="w-3 h-3 text-teal-600" />
-              Your Invention
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            {isMyInvention && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200 shadow-2xs whitespace-nowrap">
+                <CheckCircle2 className="w-3 h-3 text-teal-600" />
+                Your Invention
+              </span>
+            )}
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-600 text-white shadow-xs whitespace-nowrap">
+              {invention.category}
             </span>
-          )}
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-600 text-white shadow-xs">
-            {invention.category}
-          </span>
-          {getScalingStageBadge(invention.scaling_stage)}
+            {getScalingStageBadge(invention.scaling_stage)}
+          </div>
         </div>
       </div>
 
@@ -457,35 +486,24 @@ const InventionCard = ({ invention, onUpdate }) => {
           <span className="hidden sm:inline">{copied ? 'Copied' : 'Share'}</span>
         </motion.button>
 
-        {/* Buy / Rent / Pay to Reuse CTA or View Offers + Delete for Owner */}
+        {/* Buy / Rent / Pay to Reuse CTA or View Offers for Owner */}
         {isMyInvention ? (
-          <div className="flex items-center gap-1">
-            <motion.div whileHover={{ y: -1, scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
-              <Link
-                to="/profile?tab=offers"
-                className="w-full flex items-center justify-center gap-1 py-2 rounded-lg font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs hover:shadow-emerald-500/25 transition-all"
-                title="View incoming commercial offers for your invention"
-              >
-                <Eye className="w-3.5 h-3.5 text-emerald-200" />
-                <span className="truncate">Offers ({paidReusesCount})</span>
-              </Link>
-            </motion.div>
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-              onClick={() => setIsDeleteModalOpen(true)}
-              className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-colors cursor-pointer"
-              title="Delete this invention"
+          <motion.div whileHover={{ y: -1, scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
+            <Link
+              to="/profile?tab=offers"
+              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs hover:shadow-emerald-500/25 transition-all"
+              title="View incoming commercial offers for your invention"
             >
-              <Trash2 className="w-3.5 h-3.5 text-red-500" />
-            </motion.button>
-          </div>
+              <Eye className="w-3.5 h-3.5 text-emerald-200" />
+              <span className="truncate">Offers ({paidReusesCount})</span>
+            </Link>
+          </motion.div>
         ) : (
           <motion.button
             whileTap={{ scale: 0.98 }}
             whileHover={{ y: -1, scale: 1.02 }}
             onClick={() => setIsOfferModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 py-2 rounded-lg font-bold text-xs bg-teal-600 hover:bg-teal-700 text-white shadow-xs hover:shadow-teal-500/25 transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 py-2 rounded-xl font-bold text-xs bg-teal-600 hover:bg-teal-700 text-white shadow-xs hover:shadow-teal-500/25 transition-all cursor-pointer"
             title="Buy, rent, or pay to reuse this invention"
           >
             <Handshake className="w-4 h-4 text-amber-300" />
@@ -575,60 +593,6 @@ const InventionCard = ({ invention, onUpdate }) => {
         invention={invention}
         onOfferSuccess={handleOfferSuccess}
       />
-
-      {/* Delete Confirmation Modal for Card */}
-      <AnimatePresence>
-        {isDeleteModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 10 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-              className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center shrink-0 shadow-xs">
-                  <Trash2 className="w-6 h-6" />
-                </div>
-                <div className="space-y-1 text-left">
-                  <h3 className="text-lg font-black text-slate-900">
-                    Delete Innovation?
-                  </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Are you sure you want to delete <span className="font-bold text-slate-800">"{invention.title}"</span>? This will permanently remove it from the showcase catalog.
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-3 bg-red-50/70 rounded-xl border border-red-100 text-[11px] text-red-700 leading-normal flex items-start gap-2 text-left">
-                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
-                <span>This action cannot be undone. Its showcase entry and commercial inquiries will be retired.</span>
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-2">
-                <motion.button
-                  whileTap={{ scale: 0.94 }}
-                  disabled={isDeleting}
-                  onClick={() => setIsDeleteModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.94 }}
-                  disabled={isDeleting}
-                  onClick={handleDelete}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
-                >
-                  {isDeleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{isDeleting ? 'Deleting...' : 'Yes, Delete Invention'}</span>
-                </motion.button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 };

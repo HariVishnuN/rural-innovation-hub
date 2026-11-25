@@ -16,6 +16,7 @@ from app.routers.upload import router as upload_router
 from app.routers.investors import router as investors_router
 from app.routers.pitches import router as pitches_router
 from app.routers.officials import router as officials_router
+from app.routers.patents import router as patents_router
 
 __all__ = [
     "auth_router",
@@ -36,4 +37,5 @@ __all__ = [
     "investors_router",
     "pitches_router",
     "officials_router",
+    "patents_router",
 ]
