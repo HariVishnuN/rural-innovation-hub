@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User,
@@ -79,13 +79,21 @@ const LANGUAGES = [
 ];
 
 const ProfilePage = () => {
-  const { user, updateUser } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, updateUser } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const rawQueryTab = searchParams ? searchParams.get('tab') : null;
   const queryTab = typeof rawQueryTab === 'string' ? rawQueryTab.toLowerCase().trim() : '';
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Redirect to login if user is not authenticated and auth is not loading
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   // Active Tab state synced with URL ?tab=...
   const [activeTab, setActiveTab] = useState(() => {

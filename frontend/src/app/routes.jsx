@@ -21,11 +21,22 @@ import InvestorsDirectoryPage from '../features/investors/InvestorsDirectoryPage
 import OfficialsPortalPage from '../features/officials/OfficialsPortalPage';
 import PatentServicesPage from '../features/patents/PatentServicesPage';
 import { useAuth } from './AuthContext';
+import ErrorBoundary from '../components/ErrorBoundary';
+import { Loader2 } from 'lucide-react';
 
 // Protected Route Guard
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 space-y-4 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shadow-soft">
+          <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
+        </div>
+        <p className="text-sm font-semibold text-slate-600">Verifying session...</p>
+      </div>
+    );
+  }
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return children;
 };
@@ -33,14 +44,24 @@ const ProtectedRoute = ({ children }) => {
 // Admin Route Guard
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 space-y-4 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shadow-soft">
+          <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
+        </div>
+        <p className="text-sm font-semibold text-slate-600">Verifying admin access...</p>
+      </div>
+    );
+  }
   if (!isAuthenticated || !isAdmin) return <Navigate to="/login" replace />;
   return children;
 };
 
 export const AppRoutes = () => {
   return (
-    <Routes>
+    <ErrorBoundary title="Navigation Error">
+      <Routes>
       <Route element={<MainLayout />}>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
@@ -85,7 +106,9 @@ export const AppRoutes = () => {
           path="/profile"
           element={
             <ProtectedRoute>
-              <ProfilePage />
+              <ErrorBoundary title="Failed to load Profile">
+                <ProfilePage />
+              </ErrorBoundary>
             </ProtectedRoute>
           }
         />
@@ -120,5 +143,6 @@ export const AppRoutes = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
+    </ErrorBoundary>
   );
 };
